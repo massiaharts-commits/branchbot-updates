@@ -4,20 +4,3 @@
     "release_notes": "https://github.com/yourusername/branchbot-updates/blob/main/CHANGELOG.md",
     "message": ""
 }
-```
-
-The `message` field is optional - you can use it for things like "Critical security update!" when needed.
-
----
-
-### Step 3: Enable GitHub Pages
-
-1. Go to your repo's **Settings** tab
-2. Click **Pages** in the left sidebar
-3. Under "Source", select **Deploy from a branch**
-4. Select **main** branch and **/ (root)** folder
-5. Click **Save**
-
-Wait 1-2 minutes, then your file will be available at:
-```
-https://yourusername.github.io/branchbot-updates/version.json
