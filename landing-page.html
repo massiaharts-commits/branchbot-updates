@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Branch Bot - AI-powered visual knowledge graph that runs 100% locally. Organize research, connect ideas, and export interactive presentations.">
+    <meta name="keywords" content="knowledge management, AI notebook, visual graph, OSINT, research tool, local privacy">
+    <meta property="og:title" content="Branch Bot - Visual AI Notebook">
+    <meta property="og:description" content="Your research, visualized. AI-powered knowledge graph that runs 100% locally.">
+    <meta property="og:type" content="website">
+    <!-- TODO: Add og:image for social sharing -->
+    <!-- <meta property="og:image" content="https://branchbot.app/social-preview.png"> -->
+    
+    <title>Branch Bot - Visual AI Notebook | Organize Research & Export Presentations</title>
+    
+    <!-- TODO: Add favicon -->
+    <!-- <link rel="icon" type="image/png" href="favicon.png"> -->
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a08;
+            --bg-secondary: #141410;
+            --bg-card: #1a1a16;
+            --bg-card-hover: #222218;
+            --text-primary: #fafaf9;
+            --text-secondary: #a8a29e;
+            --text-dim: #78716c;
+
+            /* ACCENT: Swapped to Green (#22c55e) */
+            --accent: #22c55e;
+            --accent-hover: #4ade80; /* Brighter green for hover */
+            --accent-glow: rgba(34, 197, 94, 0.4);
+            --accent-soft: rgba(34, 197, 94, 0.1);
+            --accent-border: rgba(34, 197, 94, 0.2);
+
+            --border: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.12);
+
+            /* SUCCESS: Swapped to Orange (#f59e0b) */
+            --success: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 10000;
+        }
+        
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        a:hover {
+            color: var(--accent-hover);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        /* Section spacing */
+        section {
+            padding: 6rem 0;
+        }
+        
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.7;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header .section-subtitle {
+            margin: 0 auto;
+        }
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px var(--accent-glow), 0 10px 40px rgba(0,0,0,0.3);
+            color: #000;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-border);
+            color: var(--text-primary);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+        }
+        
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+        
+        /* Header */
+        header {
+            padding: 1.25rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 8, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .logo:hover {
+            color: var(--text-primary);
+        }
+        
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        nav a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        nav a:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .header-buttons .btn {
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+        }
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Ambient background glow */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1000px;
+            height: 800px;
+            background: radial-gradient(ellipse, var(--accent-soft) 0%, transparent 60%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.625rem;
+            background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+            padding: 0.5rem 1.125rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            letter-spacing: 0.02em;
+        }
+        
+        .hero-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+        
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+        }
+        
+        .hero-title .highlight {
+            color: var(--accent);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+        
+        /* Hero Image */
+        .hero-image-wrapper {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .hero-image-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(60px);
+            opacity: 0.4;
+            z-index: -1;
+        }
+        
+        .hero-image {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            box-shadow: 
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 25px 60px -10px rgba(0,0,0,0.5),
+                0 0 100px -20px var(--accent-glow);
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .hero-image-placeholder {
+            aspect-ratio: 16/10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            color: var(--text-dim);
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+        }
+        
+        .hero-image-placeholder span:first-child {
+            font-size: 4rem;
+        }
+        
+        /* Trust Badges */
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .trust-badge span:first-child {
+            font-size: 1.125rem;
+        }
+        /* Problem / Solution Section */
+        .problem-solution {
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        
+        .problem-solution::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+        }
+        
+        .problem-solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .problem-box, .solution-box {
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .problem-box {
+            background: rgba(239, 68, 68, 0.03);
+            border-color: rgba(239, 68, 68, 0.15);
+        }
+        
+        .solution-box {
+            background: rgba(34, 197, 94, 0.03);
+            border-color: rgba(34, 197, 94, 0.15);
+        }
+        
+        .problem-box h3, .solution-box h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .problem-box h3 {
+            color: #f87171;
+        }
+        
+        .solution-box h3 {
+            color: #4ade80;
+        }
+        
+        .problem-box ul, .solution-box ul {
+            list-style: none;
+        }
+        
+        .problem-box li, .solution-box li {
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .problem-box li::before {
+            content: "✕";
+            color: #f87171;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+        
+        .solution-box li::before {
+            content: "✓";
+            color: #4ade80;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 0.1rem;
+        }
+        /* Demo Section */
+        .demo-section {
+            position: relative;
+        }
+        
+        .demo-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, var(--accent-soft) 0%, transparent 70%);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .demo-container {
+            max-width: 950px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .demo-video-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            box-shadow: 
+                0 0 0 1px rgba(255,255,255,0.05),
+                0 25px 60px -10px rgba(0,0,0,0.4);
+        }
+        
+        .demo-video-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        
+        .demo-video-placeholder {
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            color: var(--text-dim);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+        }
+        
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px var(--accent-glow);
+        }
+        
+        .demo-video-wrapper iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            display: block;
+        }
+        /* Features - Bento Grid */
+        .features {
+            background: var(--bg-secondary);
+        }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 1.5rem;
+        }
+        
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at top left, var(--accent-soft) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .bento-card:hover {
+            border-color: var(--accent-border);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        }
+        
+        .bento-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Large card - spans 2 columns */
+        .bento-card.large {
+            grid-column: span 2;
+        }
+        
+        /* Tall card - spans 2 rows */
+        .bento-card.tall {
+            grid-row: span 2;
+        }
+        
+        .bento-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .bento-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.25rem;
+            display: block;
+        }
+        
+        .bento-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .bento-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .bento-card.large h3 {
+            font-size: 1.5rem;
+        }
+        
+        .bento-card.large p {
+            font-size: 1.05rem;
+            max-width: 500px;
+        }
+        
+        /* Feature image placeholder inside bento */
+        .bento-image {
+            margin-top: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+        }
+        
+        .bento-image-placeholder {
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        /* Presentation Feature (Highlighted Section) */
+        .presentation-feature {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .presentation-feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: radial-gradient(ellipse at right, var(--accent-soft) 0%, transparent 60%);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        
+        .presentation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .presentation-content h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .presentation-content p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .feature-list li span:first-child {
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .presentation-image {
+            position: relative;
+        }
+        
+        .presentation-image-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            background: var(--bg-card);
+            box-shadow: 
+                0 25px 60px -10px rgba(0,0,0,0.4),
+                0 0 80px -20px var(--accent-glow);
+        }
+        
+        .presentation-image-placeholder {
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            color: var(--text-dim);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+        }
+        
+        /* Use Cases */
+        .use-cases {
+            background: var(--bg-secondary);
+        }
+        
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .use-case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .use-case-card:hover {
+            border-color: var(--accent-border);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        }
+        
+        .use-case-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .use-case-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .use-case-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        /* Screenshots Gallery */
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .screenshot-card {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .screenshot-card:hover {
+            border-color: var(--accent-border);
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        }
+        
+        .screenshot-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .screenshot-placeholder {
+            aspect-ratio: 16/10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: var(--text-dim);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            font-size: 0.9rem;
+        }
+        
+        .screenshot-placeholder span:first-child {
+            font-size: 2.5rem;
+        }
+        
+        .screenshot-card figcaption {
+            padding: 1rem 1.25rem;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Comparison Table */
+        .comparison {
+            background: var(--bg-secondary);
+        }
+        
+        .comparison-table-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .comparison-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        
+        .comparison-table th.highlight {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+        
+        .comparison-table td {
+            font-size: 0.95rem;
+        }
+        
+        .comparison-table td.highlight {
+            background: rgba(245, 158, 11, 0.03);
+        }
+        
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tbody tr {
+            transition: background 0.2s;
+        }
+        
+        .comparison-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .check {
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .cross {
+            color: var(--text-dim);
+        }
+        /* Pricing */
+        .pricing {
+            position: relative;
+        }
+        
+        .pricing::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, var(--accent-soft) 0%, transparent 60%);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            position: relative;
+        }
+
+        @media (max-width: 1100px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem 1.25rem;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -10px rgba(0,0,0,0.3);
+        }
+        
+        .pricing-card.popular {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px -10px var(--accent-glow);
+        }
+        
+        .pricing-card.popular:hover {
+            box-shadow: 0 0 60px -10px var(--accent-glow), 0 25px 50px -10px rgba(0,0,0,0.3);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #000;
+            padding: 0.375rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-card .price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.03em;
+            margin: 0.75rem 0;
+        }
+        
+        .pricing-card .price-period {
+            font-size: 1rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .pricing-features li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .pricing-card .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .byok-note {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid var(--accent-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .byok-note strong {
+            color: var(--accent);
+        }
+        
+        .byok-note a {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        /* FAQ */
+        .faq {
+            background: var(--bg-secondary);
+        }
+        
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .faq-item:hover {
+            border-color: var(--border-light);
+        }
+        
+        .faq-item.open {
+            border-color: var(--accent-border);
+        }
+        
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1rem;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        
+        .faq-question:hover {
+            color: var(--accent);
+        }
+        
+        .faq-icon {
+            font-size: 1.25rem;
+            transition: transform 0.3s;
+            color: var(--text-dim);
+        }
+        
+        .faq-item.open .faq-icon {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-answer-content {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        /* CTA Section */
+        .cta-section {
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1000px;
+            height: 600px;
+            background: radial-gradient(ellipse, var(--accent-soft) 0%, transparent 60%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .footer-copyright {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bento-card.large {
+                grid-column: span 2;
+            }
+            
+            .bento-card.tall {
+                grid-row: span 1;
+            }
+            
+            .use-cases-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            section {
+                padding: 4rem 0;
+            }
+            
+            .container {
+                padding: 0 1.25rem;
+            }
+            
+            .hero {
+                padding: 7rem 0 3rem;
+                min-height: auto;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .hero-buttons .btn {
+                width: 100%;
+            }
+            
+            nav {
+                display: none;
+            }
+            
+            .header-buttons .btn-secondary {
+                display: none;
+            }
+            
+            .problem-solution-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bento-card.large {
+                grid-column: span 1;
+            }
+            
+            .presentation-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-table-wrapper {
+                overflow-x: auto;
+            }
+            
+            .comparison-table {
+                min-width: 600px;
+            }
+            
+            .trust-badges {
+                gap: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🌳</span>
+                    <span>Branch Bot</span>
+                </a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#demo">Demo</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#faq">FAQ</a>
+                </nav>
+                <div class="header-buttons">
+                    <a href="#pricing" class="btn btn-secondary">Get License</a>
+                    <!-- TODO: Update with actual download link -->
+                    <a href="#" class="btn btn-primary">⬇️ Download</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    New: Interactive Presentation Export
+                </div>
+                
+                <h1 class="hero-title">
+                    Your research,<br>
+                    <span class="highlight">visualized.</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    The AI-powered knowledge graph that runs 100% on your machine. 
+                    Connect ideas, organize evidence, and export interactive presentations — 
+                    without your data ever leaving your computer.
+                </p>
+                
+                <div class="hero-buttons">
+                    <!-- TODO: Update with actual download link -->
+                    <a href="#" class="btn btn-primary">
+                        <span>⬇️</span> Download Free
+                    </a>
+                    <a href="#demo" class="btn btn-secondary">
+                        <span>▶️</span> Watch Demo
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image-wrapper">
+                <div class="hero-image">
+                    <!-- TODO: Replace with actual screenshot -->
+                    <div class="hero-image-placeholder">
+                        <span>📸</span>
+                        <span>Add product screenshot here</span>
+                        <span style="font-size: 0.85rem;">1920×1080 recommended</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <span>🔒</span>
+                    <span>100% Local</span>
+                </div>
+                <div class="trust-badge">
+                    <span>🖥️</span>
+                    <span>Windows & Mac</span>
+                </div>
+                <div class="trust-badge">
+                    <span>✨</span>
+                    <span>Free Forever (200 nodes)</span>
+                </div>
+                <div class="trust-badge">
+                    <span>🤖</span>
+                    <span>Claude AI Built-in</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Problem / Solution -->
+    <section class="problem-solution">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Why Branch Bot?</span>
+                <h2 class="section-title">Traditional tools weren't built for this.</h2>
+                <p class="section-subtitle">Complex research needs visual connections, not endless folders.</p>
+            </div>
+            
+            <div class="problem-solution-grid">
+                <div class="problem-box">
+                    <h3><span>❌</span> The Problem</h3>
+                    <ul>
+                        <li>Research involves hundreds of interconnected data points</li>
+                        <li>Spreadsheets and docs can't show relationships</li>
+                        <li>Cloud tools compromise client confidentiality</li>
+                        <li>Switching between apps breaks your focus</li>
+                        <li>AI assistants don't understand your project context</li>
+                    </ul>
+                </div>
+                <div class="solution-box">
+                    <h3><span>✓</span> Branch Bot</h3>
+                    <ul>
+                        <li>Visual graph shows how everything connects</li>
+                        <li>See patterns and relationships instantly</li>
+                        <li>100% local — your data never leaves your machine</li>
+                        <li>All-in-one: notes, files, AI, visualization</li>
+                        <li>AI that knows your entire project context</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Demo -->
+    <section id="demo" class="demo-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">See it in action</span>
+                <h2 class="section-title">Watch how it works</h2>
+                <p class="section-subtitle">A 2-minute tour of Branch Bot's core features.</p>
+            </div>
+            
+            <div class="demo-container">
+                <div class="demo-video-wrapper">
+                    <!-- TODO: Replace with YouTube embed -->
+                    <div class="demo-video-placeholder">
+                        <div class="play-button">▶</div>
+                        <span>Add demo video here</span>
+                        <span style="font-size: 0.85rem;">Upload to YouTube and embed</span>
+                    </div>
+                    
+                    <!-- When you have a video:
+                    <iframe 
+                        src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+                        title="Branch Bot Demo"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                    -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Features - Bento Grid -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Features</span>
+                <h2 class="section-title">Everything you need to think better</h2>
+                <p class="section-subtitle">Powerful tools, simple interface.</p>
+            </div>
+            
+            <div class="bento-grid">
+                <!-- Large Card: Visual Graph -->
+                <div class="bento-card large">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">🌳</span>
+                        <h3>Visual Knowledge Graph</h3>
+                        <p>See how your ideas connect. Drag nodes, draw connections, and build a visual map of your entire research project. No more losing context in endless folders.</p>
+                        <div class="bento-image">
+                            <!-- TODO: Add screenshot -->
+                            <div class="bento-image-placeholder">
+                                <span style="font-size: 2rem;">📸</span>
+                                <span>Graph view screenshot</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Chat -->
+                <div class="bento-card">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">🤖</span>
+                        <h3>AI-Powered Chat</h3>
+                        <p>Claude AI built right in. Ask questions, get insights, and generate content — with full context of your project.</p>
+                    </div>
+                </div>
+                
+                <!-- File Organization -->
+                <div class="bento-card">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">📁</span>
+                        <h3>File Organization</h3>
+                        <p>Drag in any file. Images, PDFs, code, documents — all visualized as nodes in your graph.</p>
+                    </div>
+                </div>
+                
+                <!-- Presentation Export -->
+                <div class="bento-card">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">🎬</span>
+                        <h3>Presentation Export</h3>
+                        <p>Turn your research into interactive HTML presentations. Perfect for client reports or teaching.</p>
+                    </div>
+                </div>
+                
+                <!-- 100% Local -->
+                <div class="bento-card large">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">🔒</span>
+                        <h3>100% Local & Private</h3>
+                        <p>Your data never touches our servers. Everything runs on your machine — complete privacy, full control. Perfect for sensitive investigations, legal research, and confidential projects.</p>
+                    </div>
+                </div>
+                
+                <!-- Keyboard Shortcuts -->
+                <div class="bento-card">
+                    <div class="bento-card-content">
+                        <span class="bento-icon">⌨️</span>
+                        <h3>Keyboard Shortcuts</h3>
+                        <p>Navigate, edit, and organize at the speed of thought. Every action has a shortcut.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Presentation Feature (Highlighted) -->
+    <section class="presentation-feature">
+        <div class="container">
+            <div class="presentation-grid">
+                <div class="presentation-content">
+                    <span class="section-label">New Feature</span>
+                    <h2>Export <span class="highlight">Interactive Presentations</span></h2>
+                    <p>
+                        Turn your research into shareable HTML presentations that work anywhere. 
+                        No PowerPoint needed — just open in any browser.
+                    </p>
+                    <ul class="feature-list">
+                        <li><span>✓</span> Runs code demos live in the browser</li>
+                        <li><span>✓</span> Embeds images, files, and videos</li>
+                        <li><span>✓</span> Works completely offline</li>
+                        <li><span>✓</span> Drag to reorder slides</li>
+                        <li><span>✓</span> Light/dark theme toggle</li>
+                        <li><span>✓</span> Swipe navigation on mobile</li>
+                    </ul>
+                    <a href="#demo" class="btn btn-primary">See It In Action</a>
+                </div>
+                <div class="presentation-image">
+                    <div class="presentation-image-wrapper">
+                        <!-- TODO: Add screenshot/GIF -->
+                        <div class="presentation-image-placeholder">
+                            <span style="font-size: 4rem;">🎬</span>
+                            <span>Presentation export screenshot</span>
+                            <span style="font-size: 0.85rem;">Show the exported HTML presentation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Use Cases -->
+    <section class="use-cases">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Use Cases</span>
+                <h2 class="section-title">Built for serious research</h2>
+                <p class="section-subtitle">Branch Bot shines when the stakes are high.</p>
+            </div>
+            
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <span class="use-case-icon">🔍</span>
+                    <h3>Private Investigators</h3>
+                    <p>Organize case evidence, map subject connections, generate client reports.</p>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🌐</span>
+                    <h3>OSINT Analysts</h3>
+                    <p>Track digital footprints, connect entities across sources, visualize networks.</p>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">🎓</span>
+                    <h3>Educators</h3>
+                    <p>Build interactive lessons, export presentations, create engaging materials.</p>
+                </div>
+                <div class="use-case-card">
+                    <span class="use-case-icon">⚖️</span>
+                    <h3>Legal Researchers</h3>
+                    <p>Track case law, connect precedents, build comprehensive research databases.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Screenshots -->
+    <section class="screenshots">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Interface</span>
+                <h2 class="section-title">A closer look</h2>
+                <p class="section-subtitle">Clean, focused, built for deep work.</p>
+            </div>
+            
+            <div class="screenshots-grid">
+                <figure class="screenshot-card">
+                    <!-- TODO: Replace with actual screenshot -->
+                    <div class="screenshot-placeholder">
+                        <span>📸</span>
+                        <span>Graph View</span>
+                    </div>
+                    <figcaption>Visual graph showing connected nodes and relationships</figcaption>
+                </figure>
+                <figure class="screenshot-card">
+                    <!-- TODO: Replace with actual screenshot -->
+                    <div class="screenshot-placeholder">
+                        <span>📸</span>
+                        <span>AI Chat</span>
+                    </div>
+                    <figcaption>AI chat panel with context-aware responses</figcaption>
+                </figure>
+                <figure class="screenshot-card">
+                    <!-- TODO: Replace with actual screenshot -->
+                    <div class="screenshot-placeholder">
+                        <span>📸</span>
+                        <span>File Preview</span>
+                    </div>
+                    <figcaption>Preview and organize files directly in your graph</figcaption>
+                </figure>
+                <figure class="screenshot-card">
+                    <!-- TODO: Replace with actual screenshot -->
+                    <div class="screenshot-placeholder">
+                        <span>📸</span>
+                        <span>Presentation</span>
+                    </div>
+                    <figcaption>Exported interactive HTML presentation</figcaption>
+                </figure>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Comparison -->
+    <section class="comparison">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Comparison</span>
+                <h2 class="section-title">How we stack up</h2>
+                <p class="section-subtitle">Branch Bot vs. the alternatives.</p>
+            </div>
+            
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th class="highlight">Branch Bot</th>
+                            <th>Notion</th>
+                            <th>Obsidian</th>
+                            <th>Roam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Visual Graph</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="check">✓</td>
+                            <td class="check">✓</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Built-in AI Chat</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>100% Local/Private</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="check">✓</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Presentation Export</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Drag & Drop Canvas</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Free Tier</strong></td>
+                            <td class="highlight check">✓ 200 nodes</td>
+                            <td class="check">✓ limited</td>
+                            <td class="check">✓</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BYOK Option</strong></td>
+                            <td class="highlight check">✓</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                            <td class="cross">✗</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Start free. Upgrade when you need more.</p>
+                
+                <!-- Billing Toggle -->
+                <div class="billing-toggle-container">
+                    <span class="billing-label" id="lp-monthly-label">Monthly</span>
+                    <label class="billing-toggle">
+                        <input type="checkbox" id="lp-billing-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="billing-label" id="lp-yearly-label">Yearly</span>
+                    <span class="savings-badge">Save up to 27%</span>
+                </div>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Free -->
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">$0</div>
+                    <div class="price-period">forever</div>
+                    <ul class="pricing-features">
+                        <li>2 projects</li>
+                        <li>50 nodes</li>
+                        <li>Bring your own API key</li>
+                        <li>Basic features</li>
+                        <li class="disabled">No export</li>
+                    </ul>
+                    <a href="#download" class="btn btn-secondary">Download Free</a>
+                </div>
+                
+                <!-- Starter -->
+                <div class="pricing-card">
+                    <h3>Starter</h3>
+                    <div class="price">
+                        <span class="price-monthly">$9</span>
+                        <span class="price-yearly" style="display:none;">$79</span>
+                    </div>
+                    <div class="price-period">
+                        <span class="price-monthly">/month</span>
+                        <span class="price-yearly" style="display:none;">/year</span>
+                    </div>
+                    <div class="yearly-savings" style="display:none;">Save $29/year</div>
+                    <ul class="pricing-features">
+                        <li>5 projects</li>
+                        <li>500 nodes</li>
+                        <li>100 AI calls/month</li>
+                        <li>File sync & export</li>
+                        <li>Email support</li>
+                    </ul>
+                    <a href="https://massiahart.gumroad.com/l/mhuerz" class="btn btn-primary" data-plan="starter">Get Starter</a>
+                    <div class="byok-note">
+                        <strong>💡 BYOK:</strong> 
+                        <span class="price-monthly">$5/mo</span>
+                        <span class="price-yearly" style="display:none;">$49/yr</span>
+                        — <a href="https://massiahart.gumroad.com/l/ywfibd" data-plan="starter_byok">Bring your own key</a>
+                    </div>
+                </div>
+
+                <!-- Pro (Popular) -->
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3>Pro</h3>
+                    <div class="price">
+                        <span class="price-monthly">$19</span>
+                        <span class="price-yearly" style="display:none;">$169</span>
+                    </div>
+                    <div class="price-period">
+                        <span class="price-monthly">/month</span>
+                        <span class="price-yearly" style="display:none;">/year</span>
+                    </div>
+                    <div class="yearly-savings" style="display:none;">Save $59/year</div>
+                    <ul class="pricing-features">
+                        <li>15 projects</li>
+                        <li>2,500 nodes</li>
+                        <li>500 AI calls/month</li>
+                        <li>Priority support</li>
+                        <li>200MB uploads</li>
+                    </ul>
+                    <a href="https://massiahart.gumroad.com/l/xwgyq" class="btn btn-primary" data-plan="pro">Get Pro</a>
+                    <div class="byok-note">
+                        <strong>💡 BYOK:</strong> 
+                        <span class="price-monthly">$12/mo</span>
+                        <span class="price-yearly" style="display:none;">$109/yr</span>
+                        — <a href="https://massiahart.gumroad.com/l/sebudj" data-plan="pro_byok">Bring your own key</a>
+                    </div>
+                </div>
+
+                <!-- Pro Max -->
+                <div class="pricing-card">
+                    <div class="power-badge">Power Users</div>
+                    <h3>Pro Max</h3>
+                    <div class="price">
+                        <span class="price-monthly">$39</span>
+                        <span class="price-yearly" style="display:none;">$349</span>
+                    </div>
+                    <div class="price-period">
+                        <span class="price-monthly">/month</span>
+                        <span class="price-yearly" style="display:none;">/year</span>
+                    </div>
+                    <div class="yearly-savings" style="display:none;">Save $119/year</div>
+                    <ul class="pricing-features">
+                        <li>Unlimited projects</li>
+                        <li>Unlimited nodes</li>
+                        <li>2,000 AI calls/month</li>
+                        <li>1GB file uploads</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <a href="https://massiahart.gumroad.com/l/xysikv" class="btn btn-primary" data-plan="pro_max">Get Pro Max</a>
+                    <div class="byok-note">
+                        <strong>💡 BYOK:</strong> 
+                        <span class="price-monthly">$25/mo</span>
+                        <span class="price-yearly" style="display:none;">$229/yr</span>
+                        — <a href="https://massiahart.gumroad.com/l/plhxw" data-plan="pro_max_byok">Bring your own key</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+    /* Billing Toggle Styles */
+    .billing-toggle-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .billing-label {
+        font-size: 0.9rem;
+        color: #9ca3af;
+        transition: all 0.3s;
+    }
+
+    .billing-label.active {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .billing-toggle {
+        position: relative;
+        width: 50px;
+        height: 26px;
+        cursor: pointer;
+    }
+
+    .billing-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #d1d5db;
+        transition: 0.3s;
+        border-radius: 26px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+
+    .billing-toggle input:checked + .toggle-slider {
+        background-color: #6366f1;
+    }
+
+    .billing-toggle input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+
+    .savings-badge {
+        background: #10b981;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .yearly-savings {
+        color: #10b981;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.25rem;
+    }
+
+    .power-badge {
+        position: absolute;
+        top: -12px;
+        right: 1rem;
+        background: #f59e0b;
+        color: #000;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .pricing-features li.disabled {
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+    </style>
+
+    <script>
+    // Landing page billing toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggle = document.getElementById('lp-billing-toggle');
+        const monthlyLabel = document.getElementById('lp-monthly-label');
+        const yearlyLabel = document.getElementById('lp-yearly-label');
+        
+        if (!toggle) return;
+        
+        // Default to YEARLY (toggle checked)
+        toggle.checked = true;
+        monthlyLabel.classList.remove('active');
+        yearlyLabel.classList.add('active');
+        document.querySelectorAll('.price-monthly').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.price-yearly').forEach(el => el.style.display = 'inline');
+        document.querySelectorAll('.yearly-savings').forEach(el => el.style.display = 'block');
+        
+        toggle.addEventListener('change', function() {
+            const isYearly = this.checked;
+            
+            // Update labels
+            monthlyLabel.classList.toggle('active', !isYearly);
+            yearlyLabel.classList.toggle('active', isYearly);
+            
+            // Toggle prices
+            document.querySelectorAll('.price-monthly').forEach(el => {
+                el.style.display = isYearly ? 'none' : 'inline';
+            });
+            document.querySelectorAll('.price-yearly').forEach(el => {
+                el.style.display = isYearly ? 'inline' : 'none';
+            });
+            document.querySelectorAll('.yearly-savings').forEach(el => {
+                el.style.display = isYearly ? 'block' : 'none';
+            });
+            
+            // Update button links
+            document.querySelectorAll('[data-plan]').forEach(btn => {
+                const plan = btn.dataset.plan;
+                const suffix = isYearly ? '_yearly' : '';
+                const baseUrl = 'https://massiahart.gumroad.com/l/';
+                
+                // Map plan to URL slug
+                const slugMap = {
+                    'starter': 'starter',
+                    'starter_byok': 'starter-byok',
+                    'pro': 'pro',
+                    'pro_byok': 'pro-byok',
+                    'pro_max': 'promax',
+                    'pro_max_byok': 'promax-byok'
+                };
+                
+                let slug = slugMap[plan] || plan;
+                if (isYearly) slug += '-yearly';
+                
+                btn.href = baseUrl + slug;
+            });
+        });
+        
+        // Set monthly as default active
+        monthlyLabel.classList.add('active');
+    });
+    </script>
+    <!-- FAQ -->
+    <section id="faq" class="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">FAQ</span>
+                <h2 class="section-title">Questions & Answers</h2>
+                <p class="section-subtitle">Everything you need to know.</p>
+            </div>
+            
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Does Branch Bot work offline?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes! Branch Bot runs 100% locally on your computer. You can use all features without an internet connection. AI features require an API key and internet, but everything else works offline.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Can I export my data?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Absolutely. You can export your entire graph as JSON, export individual nodes, or create interactive HTML presentations. Your data is stored in standard SQLite databases that you can access anytime.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>What's BYOK (Bring Your Own Key)?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            BYOK plans let you use your own Claude API key from Anthropic. This saves you $3-4/month on subscription cost, but you pay Anthropic directly for API usage. Great for power users who want more control.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Is my data secure?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes. Branch Bot runs entirely on your local machine — your data never touches our servers. No cloud storage, no syncing to external services. You have complete control and privacy.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>What if I hit my node limit?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            You'll see a friendly notification when approaching your limit. You can upgrade your plan anytime, or delete unused nodes to make room. The free tier gives you 200 nodes to start!
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+                        <span>Can I upgrade or downgrade my plan?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes, you can change plans anytime through your Gumroad account. Changes take effect immediately.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to <span class="highlight">visualize</span> your research?</h2>
+                <p>Join investigators, researchers, and educators who think better with Branch Bot.</p>
+                <div class="cta-buttons">
+                    <!-- TODO: Update download link -->
+                    <a href="#" class="btn btn-primary">
+                        <span>⬇️</span> Download Free
+                    </a>
+                    <a href="#demo" class="btn btn-secondary">
+                        <span>▶️</span> Watch Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="#" class="footer-logo">
+                    <span>🌳</span>
+                    <span>Branch Bot</span>
+                </a>
+                <div class="footer-links">
+                    <a href="mailto:support@branchbot.app">📧 Support</a>
+                    <a href="https://massiahart.gumroad.com">🛒 Gumroad</a>
+                    <!-- TODO: Add when ready -->
+                    <!-- <a href="#">Twitter</a> -->
+                    <!-- <a href="#">Discord</a> -->
+                </div>
+                <p class="footer-copyright">© 2025 Branch Bot. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
