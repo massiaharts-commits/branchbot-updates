@@ -1412,14 +1412,8 @@
             
             <div class="hero-image-wrapper">
                 <div class="hero-image">
-                    <!-- TODO: Replace with actual screenshot -->
-                    <div class="hero-image-placeholder">
-                        <span>📸</span>
-                        <span>Add product screenshot here</span>
-                        <span style="font-size: 0.85rem;">1920×1080 recommended</span>
-                    </div>
+                    <img src="1.png" alt="Branch Bot - Visual Knowledge Graph Interface">
                 </div>
-            </div>
             
             <div class="trust-badges">
                 <div class="trust-badge">
@@ -1487,11 +1481,12 @@
             <div class="demo-container">
                 <div class="demo-video-wrapper">
                     <!-- TODO: Replace with YouTube embed -->
-                    <div class="demo-video-placeholder">
-                        <div class="play-button">▶</div>
-                        <span>Add demo video here</span>
-                        <span style="font-size: 0.85rem;">Upload to YouTube and embed</span>
-                    </div>
+                    <iframe 
+                        src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+                        title="Branch Bot Demo"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
                     
                     <!-- When you have a video:
                     <iframe 
@@ -1522,11 +1517,7 @@
                         <h3>Visual Knowledge Graph</h3>
                         <p>See how your ideas connect. Drag nodes, draw connections, and build a visual map of your entire research project. No more losing context in endless folders.</p>
                         <div class="bento-image">
-                            <!-- TODO: Add screenshot -->
-                            <div class="bento-image-placeholder">
-                                <span style="font-size: 2rem;">📸</span>
-                                <span>Graph view screenshot</span>
-                            </div>
+                            <img src="2.png" alt="Branch Bot Graph View" style="width: 100%; display: block; border-radius: 8px;">
                         </div>
                     </div>
                 </div>
@@ -1602,11 +1593,7 @@
                 <div class="presentation-image">
                     <div class="presentation-image-wrapper">
                         <!-- TODO: Add screenshot/GIF -->
-                        <div class="presentation-image-placeholder">
-                            <span style="font-size: 4rem;">🎬</span>
-                            <span>Presentation export screenshot</span>
-                            <span style="font-size: 0.85rem;">Show the exported HTML presentation</span>
-                        </div>
+                        <img src="3.png" alt="Branch Bot Presentation Export" style="width: 100%; display: block;">
                     </div>
                 </div>
             </div>
@@ -1657,37 +1644,22 @@
             
             <div class="screenshots-grid">
                 <figure class="screenshot-card">
-                    <!-- TODO: Replace with actual screenshot -->
-                    <div class="screenshot-placeholder">
-                        <span>📸</span>
-                        <span>Graph View</span>
-                    </div>
+                    <img src="4.png" alt="Graph View" style="width: 100%; display: block;">
                     <figcaption>Visual graph showing connected nodes and relationships</figcaption>
                 </figure>
                 <figure class="screenshot-card">
-                    <!-- TODO: Replace with actual screenshot -->
-                    <div class="screenshot-placeholder">
-                        <span>📸</span>
-                        <span>AI Chat</span>
-                    </div>
+                    <img src="5.png" alt="AI Chat" style="width: 100%; display: block;">
                     <figcaption>AI chat panel with context-aware responses</figcaption>
                 </figure>
                 <figure class="screenshot-card">
-                    <!-- TODO: Replace with actual screenshot -->
-                    <div class="screenshot-placeholder">
-                        <span>📸</span>
-                        <span>File Preview</span>
-                    </div>
+                    <img src="6.png" alt="File Preview" style="width: 100%; display: block;">
                     <figcaption>Preview and organize files directly in your graph</figcaption>
                 </figure>
                 <figure class="screenshot-card">
-                    <!-- TODO: Replace with actual screenshot -->
-                    <div class="screenshot-placeholder">
-                        <span>📸</span>
-                        <span>Presentation</span>
-                    </div>
+                    <img src="7.png" alt="Presentation Export" style="width: 100%; display: block;">
                     <figcaption>Exported interactive HTML presentation</figcaption>
                 </figure>
+            </div>
             </div>
         </div>
     </section>
@@ -2000,22 +1972,40 @@
         
         if (!toggle) return;
         
-        // Default to YEARLY (toggle checked)
-        toggle.checked = true;
-        monthlyLabel.classList.remove('active');
-        yearlyLabel.classList.add('active');
-        document.querySelectorAll('.price-monthly').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.price-yearly').forEach(el => el.style.display = 'inline');
-        document.querySelectorAll('.yearly-savings').forEach(el => el.style.display = 'block');
+        // Gumroad product URLs
+        const gumroadUrls = {
+            'starter': {
+                monthly: 'https://massiahart.gumroad.com/l/mhuerz',
+                yearly: 'https://massiahart.gumroad.com/l/cxnoe'
+            },
+            'starter_byok': {
+                monthly: 'https://massiahart.gumroad.com/l/ywfibd',
+                yearly: 'https://massiahart.gumroad.com/l/peswy'
+            },
+            'pro': {
+                monthly: 'https://massiahart.gumroad.com/l/xwgyq',
+                yearly: 'https://massiahart.gumroad.com/l/pvkpdf'
+            },
+            'pro_byok': {
+                monthly: 'https://massiahart.gumroad.com/l/sebudj',
+                yearly: 'https://massiahart.gumroad.com/l/esunpq'
+            },
+            'pro_max': {
+                monthly: 'https://massiahart.gumroad.com/l/xysikv',
+                yearly: 'https://massiahart.gumroad.com/l/ynjcd'
+            },
+            'pro_max_byok': {
+                monthly: 'https://massiahart.gumroad.com/l/plhxw',
+                yearly: 'https://massiahart.gumroad.com/l/pykkjf'
+            }
+        };
         
-        toggle.addEventListener('change', function() {
-            const isYearly = this.checked;
-            
+        function updatePrices(isYearly) {
             // Update labels
             monthlyLabel.classList.toggle('active', !isYearly);
             yearlyLabel.classList.toggle('active', isYearly);
             
-            // Toggle prices
+            // Toggle price displays
             document.querySelectorAll('.price-monthly').forEach(el => {
                 el.style.display = isYearly ? 'none' : 'inline';
             });
@@ -2029,28 +2019,19 @@
             // Update button links
             document.querySelectorAll('[data-plan]').forEach(btn => {
                 const plan = btn.dataset.plan;
-                const suffix = isYearly ? '_yearly' : '';
-                const baseUrl = 'https://massiahart.gumroad.com/l/';
-                
-                // Map plan to URL slug
-                const slugMap = {
-                    'starter': 'starter',
-                    'starter_byok': 'starter-byok',
-                    'pro': 'pro',
-                    'pro_byok': 'pro-byok',
-                    'pro_max': 'promax',
-                    'pro_max_byok': 'promax-byok'
-                };
-                
-                let slug = slugMap[plan] || plan;
-                if (isYearly) slug += '-yearly';
-                
-                btn.href = baseUrl + slug;
+                if (gumroadUrls[plan]) {
+                    btn.href = isYearly ? gumroadUrls[plan].yearly : gumroadUrls[plan].monthly;
+                }
             });
-        });
+        }
         
-        // Set monthly as default active
-        monthlyLabel.classList.add('active');
+        // Default to YEARLY (toggle checked)
+        toggle.checked = true;
+        updatePrices(true);
+        
+        toggle.addEventListener('change', function() {
+            updatePrices(this.checked);
+        });
     });
     </script>
     <!-- FAQ -->
@@ -2145,7 +2126,7 @@
                 <p>Join investigators, researchers, and educators who think better with Branch Bot.</p>
                 <div class="cta-buttons">
                     <!-- TODO: Update download link -->
-                    <a href="#" class="btn btn-primary">
+                    <a href="#pricing" class="btn btn-primary">
                         <span>⬇️</span> Download Free
                     </a>
                     <a href="#demo" class="btn btn-secondary">
