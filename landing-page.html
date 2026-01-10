@@ -1819,6 +1819,46 @@
             </div>
         </div>
     </section>
+    <!-- Privacy & Security -->
+    <section class="privacy-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Privacy & Security</span>
+                <h2 class="section-title">Your data stays yours. Period.</h2>
+                <p class="section-subtitle">Built for people who handle sensitive information.</p>
+            </div>
+            
+            <div class="privacy-grid">
+                <div class="privacy-card">
+                    <span class="privacy-icon">🔒</span>
+                    <h3>100% Local Storage</h3>
+                    <p>Your notes, files, and graphs never leave your computer. Everything is stored in SQLite databases on your machine that you fully control.</p>
+                </div>
+                
+                <div class="privacy-card">
+                    <span class="privacy-icon">🤖</span>
+                    <h3>AI Transparency</h3>
+                    <p>When you use AI features, your messages go to Anthropic's Claude API. With BYOK, they go directly from your machine. We never log or store your conversations.</p>
+                </div>
+                
+                <div class="privacy-card">
+                    <span class="privacy-icon">📊</span>
+                    <h3>Minimal Analytics</h3>
+                    <p>We use Microsoft Clarity to improve the app (not to spy on you). Sensitive inputs are auto-masked, and you can opt out anytime in Settings.</p>
+                </div>
+                
+                <div class="privacy-card">
+                    <span class="privacy-icon">🚫</span>
+                    <h3>What We Don't Do</h3>
+                    <p>We don't sell your data, track you across sites, or store your research. Your investigation files are none of our business.</p>
+                </div>
+            </div>
+            
+            <div class="privacy-cta">
+                <a href="privacy.html" class="btn btn-ghost">Read our full Privacy Policy →</a>
+            </div>
+        </div>
+    </section>
     <!-- Pricing Section -->
     <section id="pricing" class="pricing-section">
         <div class="container">
@@ -2041,6 +2081,91 @@
         color: #9ca3af;
         text-decoration: line-through;
     }
+    /* Privacy Section */
+    .privacy-section {
+        background: var(--bg-primary);
+        position: relative;
+    }
+
+    .privacy-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+    }
+
+    .privacy-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .privacy-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .privacy-card:hover {
+        border-color: var(--accent-border);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+    }
+
+    .privacy-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .privacy-card h3 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+
+    .privacy-card p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .privacy-cta {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .privacy-cta .btn-ghost {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .privacy-cta .btn-ghost:hover {
+        color: var(--accent-hover);
+        background: var(--accent-soft);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .privacy-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .privacy-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     </style>
 
     <script>
@@ -2228,9 +2353,7 @@
                 <div class="footer-links">
                     <a href="mailto:support@branchbot.app">📧 Support</a>
                     <a href="https://massiahart.gumroad.com">🛒 Gumroad</a>
-                    <!-- TODO: Add when ready -->
-                    <!-- <a href="#">Twitter</a> -->
-                    <!-- <a href="#">Discord</a> -->
+                    <a href="privacy.html">🔒 Privacy</a>
                 </div>
                 <p class="footer-copyright">© 2025 Branch Bot. All rights reserved.</p>
             </div>
@@ -2279,5 +2402,4 @@
     });
     </script>
 </body>
-
 </html>
