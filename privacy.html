@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Branch Bot Privacy Policy - Your data stays yours.">
+    <title>Privacy Policy - Branch Bot</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a08;
+            --bg-secondary: #141410;
+            --bg-card: #1a1a16;
+            --text-primary: #fafaf9;
+            --text-secondary: #a8a29e;
+            --text-dim: #78716c;
+            --accent: #22c55e;
+            --accent-hover: #4ade80;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.12);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+        
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+        
+        /* Header */
+        header {
+            padding: 1.25rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 8, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logo:hover {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        .back-link {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.03em;
+        }
+        
+        .last-updated {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        
+        .intro {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+        
+        .intro strong {
+            color: var(--text-primary);
+        }
+        
+        .tldr {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            letter-spacing: -0.02em;
+        }
+        
+        h2:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Never list */
+        .never-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .never-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.75rem;
+            position: relative;
+        }
+        
+        .never-list li::before {
+            content: "❌";
+            position: absolute;
+            left: 0;
+            font-size: 0.9rem;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            color: var(--text-primary);
+            font-weight: 600;
+            background: var(--bg-secondary);
+        }
+        
+        td {
+            color: var(--text-secondary);
+        }
+        
+        /* Contact box */
+        .contact-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .contact-box p {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-box a {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        /* Footer note */
+        .footer-note {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            font-style: italic;
+            color: var(--text-dim);
+            text-align: center;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .copyright {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 7rem 1.25rem 3rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="landing-page.html" class="logo">
+                <span>🌳</span>
+                <span>Branch Bot</span>
+            </a>
+            <a href="landing-page.html" class="back-link">← Back to Home</a>
+        </div>
+    </header>
+    
+    <main>
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: January 2025</p>
+        
+        <p class="intro">
+            Branch Bot is built for people who handle sensitive information — investigators, researchers, legal professionals. We take your privacy as seriously as you take your clients'.
+        </p>
+        
+        <div class="tldr">
+            <strong>The short version:</strong> Your research stays on your computer. We don't see it, store it, or want it.
+        </div>
+        
+        <h2>What We Store (Almost Nothing)</h2>
+        
+        <h3>On Your Computer (100% Local)</h3>
+        <ul>
+            <li>All your notes, nodes, and graphs</li>
+            <li>Uploaded files and images</li>
+            <li>Project databases (SQLite format)</li>
+            <li>Your settings and preferences</li>
+        </ul>
+        <p>We have zero access to this data. It never touches our servers.</p>
+        
+        <h3>On Our Systems (License Only)</h3>
+        <ul>
+            <li>Email address (for license activation)</li>
+            <li>License key and plan type</li>
+            <li>Purchase date and status</li>
+        </ul>
+        <p>That's it. No content, no files, no research.</p>
+        
+        <h2>AI Features</h2>
+        <p>When you use AI chat features, your messages are sent to Anthropic's Claude API to generate responses.</p>
+        
+        <h3>If you use our hosted AI credits:</h3>
+        <ul>
+            <li>Messages route through our server to Anthropic</li>
+            <li>We do NOT log or store message content</li>
+            <li>We only track usage counts for billing</li>
+        </ul>
+        
+        <h3>If you use BYOK (Bring Your Own Key):</h3>
+        <ul>
+            <li>Messages go directly from your machine to Anthropic</li>
+            <li>We never see your conversations</li>
+            <li>You pay Anthropic directly</li>
+        </ul>
+        
+        <p>In both cases, Anthropic's privacy policy applies to AI interactions. We recommend reviewing it at <a href="https://www.anthropic.com/privacy" target="_blank">anthropic.com/privacy</a>.</p>
+        
+        <h2>Analytics</h2>
+        <p>We use Microsoft Clarity to understand how people use Branch Bot. This helps us fix bugs and improve the interface.</p>
+        
+        <h3>What Clarity collects:</h3>
+        <ul>
+            <li>Anonymous session recordings (mouse movements, clicks)</li>
+            <li>Page views and feature usage</li>
+            <li>Device type and browser info</li>
+        </ul>
+        
+        <h3>What Clarity does NOT collect:</h3>
+        <ul>
+            <li>Your notes, files, or research content</li>
+            <li>API keys (automatically masked)</li>
+            <li>Passwords (automatically masked)</li>
+            <li>Personal content you type</li>
+        </ul>
+        
+        <p><strong>You can opt out:</strong> Settings → Analytics → Disable anonymous usage analytics</p>
+        
+        <h2>Error Tracking</h2>
+        <p>We use Sentry to catch crashes and bugs before they ruin your day.</p>
+        
+        <h3>What Sentry collects:</h3>
+        <ul>
+            <li>Error messages and stack traces</li>
+            <li>Browser/OS version</li>
+            <li>Anonymous session ID</li>
+        </ul>
+        
+        <h3>What Sentry does NOT collect:</h3>
+        <ul>
+            <li>Your content or files</li>
+            <li>API keys or credentials</li>
+            <li>Personal information</li>
+        </ul>
+        
+        <h2>What We Will Never Do</h2>
+        <ul class="never-list">
+            <li>Sell your data to anyone</li>
+            <li>Share your information with advertisers</li>
+            <li>Store your research content on our servers</li>
+            <li>Track you across other websites</li>
+            <li>Send you spam (only transactional emails)</li>
+            <li>Make your data accessible to our employees</li>
+        </ul>
+        
+        <h2>Third Parties</h2>
+        <p>The only third parties involved are:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Purpose</th>
+                    <th>Privacy Policy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Anthropic</td>
+                    <td>AI responses</td>
+                    <td><a href="https://www.anthropic.com/privacy" target="_blank">anthropic.com/privacy</a></td>
+                </tr>
+                <tr>
+                    <td>Gumroad</td>
+                    <td>Payments & licensing</td>
+                    <td><a href="https://gumroad.com/privacy" target="_blank">gumroad.com/privacy</a></td>
+                </tr>
+                <tr>
+                    <td>Microsoft Clarity</td>
+                    <td>Analytics (opt-out available)</td>
+                    <td><a href="https://clarity.microsoft.com/terms" target="_blank">clarity.microsoft.com/terms</a></td>
+                </tr>
+                <tr>
+                    <td>Sentry</td>
+                    <td>Error tracking</td>
+                    <td><a href="https://sentry.io/privacy" target="_blank">sentry.io/privacy</a></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p>We do not use Google Analytics, Facebook pixels, or any advertising trackers.</p>
+        
+        <h2>Data Retention</h2>
+        <ul>
+            <li><strong>Your local data:</strong> Stays on your machine until you delete it. We can't touch it.</li>
+            <li><strong>License info:</strong> Kept while your account is active. Deleted upon request.</li>
+            <li><strong>Analytics:</strong> Microsoft Clarity retains data for 30 days.</li>
+            <li><strong>Error logs:</strong> Sentry retains data for 90 days.</li>
+        </ul>
+        
+        <h2>Your Rights</h2>
+        <p>You can:</p>
+        <ul>
+            <li><strong>Export</strong> all your data anytime (JSON, HTML, or raw database)</li>
+            <li><strong>Delete</strong> your local data by removing the app</li>
+            <li><strong>Opt out</strong> of analytics in Settings</li>
+            <li><strong>Request deletion</strong> of license info by emailing us</li>
+        </ul>
+        
+        <h2>Security</h2>
+        <ul>
+            <li>API keys are encrypted before storage</li>
+            <li>All network requests use HTTPS</li>
+            <li>No cloud sync means no cloud vulnerabilities</li>
+            <li>You control your own backups</li>
+        </ul>
+        
+        <h2>Children</h2>
+        <p>Branch Bot is not intended for users under 13. We do not knowingly collect information from children.</p>
+        
+        <h2>Changes to This Policy</h2>
+        <p>If we make significant changes, we'll notify you in the app and update the "Last updated" date above.</p>
+        
+        <div class="contact-box">
+            <p>Questions about privacy?</p>
+            <a href="mailto:support@branchbot.app">📧 support@branchbot.app</a>
+            <p style="margin-top: 0.5rem; color: var(--text-dim); font-size: 0.9rem;">We read every message and typically respond within 24 hours.</p>
+        </div>
+        
+        <p class="footer-note">
+            Branch Bot is built by a solo developer who believes privacy isn't a feature — it's a right. Your research is your business, not ours.
+        </p>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="landing-page.html">Home</a>
+                <a href="mailto:support@branchbot.app">Support</a>
+                <a href="https://massiahart.gumroad.com">Gumroad</a>
+            </div>
+            <p class="copyright">© 2025 Branch Bot. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
