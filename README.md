@@ -184,7 +184,7 @@ Branch Bot is built with:
 - Analytics (Microsoft Clarity) can be disabled in Settings
 - API keys encrypted before storage
 
-👉 [Read full Privacy Policy](https://your-website.com/privacy.html)
+👉 [Read full Privacy Policy](https://massiaharts-commits.github.io/branchbot-updates/privacy.html)
 
 ---
 
