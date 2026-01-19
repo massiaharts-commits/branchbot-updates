@@ -150,7 +150,7 @@ Branch Bot offers a **free tier** plus paid plans for power users.
 
 **Yearly billing:** Save up to 27% with annual plans.
 
-👉 [View full pricing](https://your-website.com/#pricing)
+👉 [View full pricing](https://massiaharts-commits.github.io/branchbot-updates/landing-page.html#pricing)
 
 ---
 
