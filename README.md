@@ -90,7 +90,7 @@ Easy on the eyes, day or night.
 
 | Platform | Download |
 |----------|----------|
-| **Windows** | [BranchBot-Setup-1.0.0.exe](#) |
+| **Windows** | [BranchBot-Setup-1.0.0.exe](https://github.com/massiaharts-commits/branchbot-updates/releases/download/v1.0.0/BranchBot_v1.0.0_Windows.zip)(#) |
 | **Mac (Intel)** | [BranchBot-1.0.0-x64.dmg](#) |
 | **Mac (Apple Silicon)** | [BranchBot-1.0.0-arm64.dmg](#) |
 | **Linux** | [BranchBot-1.0.0.AppImage](#) |
