@@ -91,9 +91,9 @@ Easy on the eyes, day or night.
 | Platform | Download |
 |----------|----------|
 | **Windows** | [BranchBot-Setup-1.0.0.exe](https://github.com/massiaharts-commits/branchbot-updates/releases/download/v1.0.0/BranchBot_v1.0.0_Windows.zip) |
-| **Mac (Intel)** | [BranchBot-1.0.0-x64.dmg](#) |
-| **Mac (Apple Silicon)** | [BranchBot-1.0.0-arm64.dmg](#) |
-| **Linux** | [BranchBot-1.0.0.AppImage](#) |
+| **Mac (Intel)** | Coming Soon |
+| **Mac (Apple Silicon)** | Coming Soon |
+| **Linux** | Coming Soon |
 
 > **Note:** Replace `#` with actual download links from your releases page or website.
 
@@ -141,10 +141,10 @@ Branch Bot offers a **free tier** plus paid plans for power users.
 
 | Plan | Price | Projects | Nodes | AI Calls |
 |------|-------|----------|-------|----------|
-| **Free** | $0 | 2 | 50 | BYOK only |
-| **Starter** | $9/mo | 5 | 500 | 100/mo |
-| **Pro** | $19/mo | 15 | 2,500 | 500/mo |
-| **Pro Max** | $39/mo | Unlimited | Unlimited | 2,000/mo |
+| **Free** | $0 | 2 | 50 | 5/mo |
+| **Starter** | $8/mo | 5 | 500 | 150/mo |
+| **Pro** | $19/mo | 20 | 2,500 | 400/mo |
+| **Pro Max** | $59/mo | Unlimited | Unlimited | 1,000/mo |
 
 **BYOK (Bring Your Own Key):** All paid plans have discounted BYOK variants where you use your own Anthropic API key.
 
