@@ -3240,6 +3240,9 @@
     function showSlide(orderIndex) {
         if (orderIndex < 0 || orderIndex >= currentOrder.length) return;
         
+        // Cancel any in-progress animation before showing new slide
+        cancelAnimation();
+        
         currentIndex = orderIndex;
         var nodeIndex = currentOrder[orderIndex];
         var node = nodes[nodeIndex];
@@ -4497,14 +4500,27 @@
         } catch (e) {}
     }
     
-    function skipAnimation() {
-        if (!isAnimating) return;
-        
-        // Clear typewriter timeout
+    function cancelAnimation() {
+        // Clear any pending typewriter timeout
         if (typewriterTimeout) {
             clearTimeout(typewriterTimeout);
             typewriterTimeout = null;
         }
+        
+        // Reset animation state
+        isAnimating = false;
+        
+        // Remove any animation classes from card
+        var card = document.querySelector('.card');
+        if (card) {
+            card.classList.remove('animate-fade');
+        }
+    }
+    
+    function skipAnimation() {
+        if (!isAnimating) return;
+        
+        cancelAnimation();
         
         // Show all content immediately
         var content = document.getElementById('cardContent');
@@ -4514,19 +4530,19 @@
                 content.innerHTML = contentDiv.dataset.fullHtml;
             }
         }
-        
-        isAnimating = false;
     }
     
     function runFadeAnimation(card) {
         var duration = ANIMATION_CONFIG.fadeDurations[currentFadeSpeed] || 0;
         
+        // Always remove old animation first
+        card.classList.remove('animate-fade');
+        
         if (duration === 0) return;
         
         card.style.setProperty('--fade-duration', duration + 'ms');
-        card.classList.remove('animate-fade');
         
-        // Force reflow
+        // Force reflow to reset animation
         void card.offsetWidth;
         
         card.classList.add('animate-fade');
@@ -4575,7 +4591,13 @@
         var delayPerChunk = Math.max(50, speed * 3);
         
         function showNextChunk() {
-            if (currentIndex >= chunks.length || !isAnimating) {
+            // Safety check - if we've navigated away, abort
+            if (!isAnimating || !document.contains(contentEl)) {
+                isAnimating = false;
+                return;
+            }
+            
+            if (currentIndex >= chunks.length) {
                 contentEl.innerHTML = html;
                 isAnimating = false;
                 return;
