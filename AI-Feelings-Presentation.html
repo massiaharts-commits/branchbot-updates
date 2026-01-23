@@ -1,0 +1,4211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>branch-bot-tutorial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0d1117;
+            --bg-medium: #161b22;
+            --bg-light: #21262d;
+            --bg-card: #1a1f2e;
+            --text: #e6edf3;
+            --text-dim: #8b949e;
+            --border: #30363d;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #ffffff;
+            --bg-medium: #f6f8fa;
+            --bg-light: #e8ebef;
+            --bg-card: #ffffff;
+            --text: #1f2328;
+            --text-dim: #656d76;
+            --border: #d0d7de;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Linked checklist items - read only with hint */
+        .checklist-item.linked-item {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .checklist-item.linked-item:hover {
+            background: var(--bg-light);
+        }
+        .checklist-item.linked-item .checkmark {
+            background: var(--bg-dark);
+            border: 2px dashed var(--border);
+        }
+        .checklist-item.linked-item.checked .checkmark {
+            background: #22c55e;
+            border: 2px solid #22c55e;
+            color: white;
+        }
+        .link-hint {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-left: auto;
+        }
+        /* Header */
+        .header {
+            background: var(--bg-medium);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 { font-size: 1.25rem; font-weight: 600; }
+        .header h1::before { content: '🌳 '; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .restart-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .restart-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+        .slide-counter {
+            background: var(--bg-light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+        .slide-counter strong { color: var(--accent); }
+        .slide-counter {
+            background: var(--bg-light);
+            padding: 0.5rem 1rem;
+            padding-right: 3rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+        .slide-counter strong { color: var(--accent); }
+        
+        /* Main content */
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+        }
+        
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 1100px;
+            width: 95%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-light);
+        }
+        .card-header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .card-title { font-size: 1.125rem; font-weight: 600; }
+        .card-meta { display: flex; gap: 0.5rem; }
+        .tag {
+            background: var(--bg-medium);
+            color: var(--text-dim);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .card-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        .card-content p { margin-bottom: 1rem; }
+        .card-content p:last-child { margin-bottom: 0; }
+        .card-content img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            margin: 1rem 0; 
+            cursor: zoom-in;
+            transition: transform 0.2s ease;
+        }
+        .card-content img:hover { transform: scale(1.02); }
+        .card-content a { color: var(--accent); text-decoration: none; }
+        .card-content a:hover { text-decoration: underline; }
+        .card-content pre {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+        }
+        /* Mark Complete Button */
+        .mark-complete-btn {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .mark-complete-btn:hover {
+            background: var(--bg-light);
+            border-color: var(--accent);
+        }
+        .mark-complete-btn.completed {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: #000;
+            font-weight: 600;
+        }
+        .mark-complete-btn.completed:hover {
+            background: #16a34a;
+            border-color: #16a34a;
+        }
+        .mark-complete-btn.hidden {
+            display: none;
+        }
+        /* Mentions */
+        .mention-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.125rem 0.25rem;
+            border-radius: 4px;
+            background: rgba(245, 158, 11, 0.1);
+            transition: all 0.2s;
+        }
+        .mention-link:hover {
+            background: rgba(245, 158, 11, 0.2);
+            text-decoration: none;
+        }
+        .mention-link.disabled {
+            color: var(--text-dim);
+            cursor: not-allowed;
+            text-decoration: line-through;
+            background: transparent;
+        }
+        
+        /* Video */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+        
+        /* Interactive code frame - Theater Mode */
+        .interactive-frame {
+            width: 100%;
+            min-height: 500px;
+            height: 70vh;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+        .interactive-wrapper {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .frame-controls {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            gap: 0.25rem;
+            z-index: 10;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .frame-controls:hover {
+            opacity: 1;
+        }
+        .frame-btn {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .frame-btn:hover { background: rgba(245, 158, 11, 0.9); color: #000; }
+        .frame-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .source-code {
+            display: none;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 70vh;
+            height: 70vh;
+        }
+        
+        /* Interactive slide - wider card */
+        .card.interactive-mode {
+            max-width: 1400px;
+            width: 98%;
+            max-height: 90vh;
+        }
+        .card.interactive-mode .card-content {
+            padding: 0;
+            overflow: hidden;
+        }
+        .card.interactive-mode .interactive-wrapper {
+            padding: 1rem;
+        }
+        
+        /* Gradient header fade for interactive slides */
+        .card.interactive-mode .card-header {
+            position: relative;
+            border-bottom: none;
+        }
+        .card.interactive-mode .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--header-color, var(--bg-light)) 0%, transparent 100%);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .card.interactive-mode .card-content {
+            position: relative;
+            z-index: 2;
+        }
+        .source-code {
+            display: none;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        /* Data Table Styles */
+        .data-table-container {
+            margin: 1rem 0;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .data-table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .data-table-info {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        .data-table-info strong {
+            color: var(--text);
+        }
+        .data-view-toggle {
+            display: flex;
+            gap: 0.25rem;
+        }
+        .data-view-btn {
+            padding: 0.4rem 0.75rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .data-view-btn:hover {
+            background: var(--bg-light);
+            color: var(--text);
+        }
+        .data-view-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .data-table-wrapper {
+            max-height: 400px;
+            overflow: auto;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .data-table th {
+            position: sticky;
+            top: 0;
+            background: var(--bg-medium);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        .data-table th:hover {
+            background: var(--bg-light);
+        }
+        .data-table th .sort-icon {
+            margin-left: 0.5rem;
+            opacity: 0.5;
+        }
+        .data-table th.sorted .sort-icon {
+            opacity: 1;
+            color: var(--accent);
+        }
+        .data-table td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .data-table tr:hover td {
+            background: var(--bg-light);
+        }
+        .data-table tr:nth-child(even) td {
+            background: rgba(255,255,255,0.02);
+        }
+        .data-table tr:nth-child(even):hover td {
+            background: var(--bg-light);
+        }
+        .data-table-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-light);
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        .pagination-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .pagination-btn {
+            padding: 0.3rem 0.6rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            padding: 1rem;
+            background: var(--bg-dark);
+            border-radius: 0 0 8px 8px;
+        }
+        .chart-config {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .chart-config-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .chart-config-group label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .chart-config-group select {
+            padding: 0.4rem 0.6rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .chart-type-btns {
+            display: flex;
+            gap: 0.25rem;
+        }
+        .chart-type-btn {
+            padding: 0.4rem 0.6rem;
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .chart-type-btn:hover {
+            background: var(--bg-light);
+            color: var(--text);
+        }
+        .chart-type-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .chart-canvas-container {
+            position: relative;
+            height: 350px;
+            margin-top: 1rem;
+        }
+        .chart-warning {
+            padding: 0.75rem 1rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--accent);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+        .chart-error {
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ef4444;
+            text-align: center;
+        }
+        .no-data-message {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-dim);
+        }
+        .chart-pagination {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+        .chart-page-info {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            min-width: 70px;
+            text-align: center;
+        }
+        /* File card */
+        .file-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .file-icon { font-size: 2rem; }
+        .file-info { flex: 1; }
+        .file-name { font-weight: 600; }
+        .file-meta { font-size: 0.75rem; color: var(--text-dim); }
+        .file-download {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .file-download:hover { background: var(--accent-hover); }
+        
+        /* Link card */
+        .link-card {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .link-card:hover { border-color: var(--accent); background: var(--bg-medium); }
+        .link-icon { font-size: 1.5rem; }
+        .link-url { color: var(--accent); font-size: 0.875rem; word-break: break-all; }
+        
+        /* Navigation */
+        .nav {
+            background: var(--bg-medium);
+            border-top: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .nav-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #000;
+        }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .nav-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #000;
+            font-weight: 600;
+        }
+        .nav-btn.primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        
+        /* Fixed buttons */
+        .fullscreen-btn, .sidebar-toggle, .theme-toggle {
+            position: fixed;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+        .fullscreen-btn { top: 4rem; right: 1rem; }
+        .theme-toggle { top: 1rem; right: 1rem; }
+        .sidebar-toggle { left: 1rem; top: 50%; transform: translateY(-50%); }
+        .fullscreen-btn:hover, .sidebar-toggle:hover, .theme-toggle:hover { 
+            background: var(--accent); 
+            color: #000; 
+        }
+        /* Video Thumbnail */
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-thumbnail:hover img {
+            opacity: 0.8;
+        }
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: var(--text-dim);
+        }
+        .video-placeholder span {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 0, 0, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            transition: all 0.2s;
+        }
+        .video-thumbnail:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(255, 0, 0, 1);
+        }
+        .video-platform {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Audio Card */
+        .audio-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-medium));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 1rem 0;
+        }
+        .audio-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .audio-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+            border-radius: 8px;
+        }
+        .audio-info {
+            flex: 1;
+        }
+        .audio-platform {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        .audio-action {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+        .audio-play-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1rem;
+        }
+        .audio-player-container {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .audio-icon-large {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        /* Progress bar */
+        .progress-bar { height: 3px; background: var(--bg-light); }
+        .progress-fill { height: 100%; background: var(--accent); transition: width 0.3s ease; }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 280px;
+            background: var(--bg-medium);
+            border-right: 1px solid var(--border);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 99;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-dim);
+        }
+        .sidebar-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: grab;
+            margin-bottom: 0.5rem;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar-item:active { cursor: grabbing; }
+        .sidebar-item:hover { background: var(--bg-light); }
+        .sidebar-item.active { background: var(--bg-light); border-color: var(--accent); }
+        .sidebar-item.dragging { opacity: 0.5; background: var(--accent); }
+        .sidebar-item.drag-over { border-color: var(--accent); border-style: dashed; }
+        .sidebar-item.hidden { opacity: 0.4; }
+        .sidebar-item.hidden .sidebar-item-title { text-decoration: line-through; }
+        .drag-handle {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            cursor: grab;
+            padding: 0.25rem;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        .sidebar-item-content { flex: 1; min-width: 0; }
+        .sidebar-item-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sidebar-item-num { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+        .sidebar-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.75rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-action-btn {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            flex: 1;
+        }
+        .sidebar-action-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+        .visibility-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .visibility-btn:hover { background: var(--bg-medium); color: var(--text); }
+        .sidebar-item.hidden .visibility-btn { color: var(--accent); }
+        /* Sidebar Progress Header */
+        .sidebar-progress-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-light);
+        }
+        .sidebar-progress-header .sidebar-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .sidebar-progress-header .sidebar-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.3s ease;
+        }
+        .sidebar-progress-header .sidebar-progress-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: right;
+        }
+        .sidebar-progress-header.hidden {
+            display: none;
+        }
+        
+        /* Sidebar Tabs */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-tab {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background: var(--bg-medium);
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sidebar-tab:hover {
+            background: var(--bg-light);
+            color: var(--text);
+        }
+        .sidebar-tab.active {
+            background: var(--bg-light);
+            color: var(--text);
+            border-bottom-color: var(--accent);
+        }
+        .sidebar-tab.hidden {
+            display: none;
+        }
+        .sidebar-tabs:has(.sidebar-tab.hidden) .sidebar-tab:not(.hidden) {
+            flex: none;
+            width: 100%;
+        }
+        
+        /* Sidebar Tab Content */
+        .sidebar-tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+        }
+        .sidebar-tab-content.hidden {
+            display: none;
+        }
+        .sidebar-tab-header {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Checklist in sidebar */
+        #checklistSidebarContent .checklist-section-label {
+            padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+        }
+        #checklistSidebarContent .sidebar-checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+        }
+        #checklistSidebarContent .sidebar-checklist-item:hover {
+            background: var(--bg-light);
+        }
+        #checklistSidebarContent .sidebar-checklist-item.checked {
+            opacity: 0.6;
+        }
+        #checklistSidebarContent .sidebar-checklist-item.checked .sidebar-item-text {
+            text-decoration: line-through;
+        }
+        #checklistSidebarContent .sidebar-checklist-item .checkmark {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 9px;
+            background: var(--bg-dark);
+        }
+        #checklistSidebarContent .sidebar-checklist-item.checked .checkmark {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+        #checklistSidebarContent .sidebar-item-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #checklistSidebarContent .sidebar-item-link {
+            color: var(--accent);
+            font-size: 0.65rem;
+            padding: 0.1rem 0.3rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        #checklistSidebarContent .sidebar-item-link:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        #checklistSidebarContent .checklist-due {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.3rem;
+        }
+        /* Image zoom modal */
+        .image-zoom-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            cursor: zoom-out;
+        }
+        .image-zoom-overlay.open { opacity: 1; visibility: visible; }
+        .image-zoom-overlay img {
+            max-width: 95vw;
+            max-height: 95vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .image-zoom-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-zoom-close:hover { background: var(--accent); color: #000; }
+        
+        /* Checklist Styles */
+        .checklist-wrapper { padding: 1rem 0; }
+        .checklist-progress-bar {
+            position: relative;
+            height: 24px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .checklist-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+        .checklist-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .checklist-items { display: flex; flex-direction: column; gap: 0.5rem; }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checklist-item:hover { background: var(--bg-medium); }
+        .checklist-item.checked { opacity: 0.7; }
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            color: var(--text-dim);
+        }
+        .checklist-item input[type="checkbox"] { display: none; }
+        .checklist-item .checkmark {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: var(--bg-dark);
+        }
+        .checklist-item.checked .checkmark {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+        .checklist-item.checked .checkmark::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .checklist-text { flex: 1; font-size: 0.95rem; }
+        .checklist-due {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .checklist-due.due-overdue { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .checklist-due.due-today { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .checklist-due.due-tomorrow { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .checklist-due.due-soon { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+        .checklist-due.due-later { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+        /* Linked items show navigation hint */
+        #checklistSidebarContent .sidebar-checklist-item[data-has-link="true"] .checkmark {
+            opacity: 0.5;
+        }
+        #checklistSidebarContent .sidebar-checklist-item[data-has-link="true"]:hover .checkmark {
+            opacity: 0.7;
+        }
+        /* Non-linked items are fully interactive */
+        #checklistSidebarContent .sidebar-checklist-item[data-has-link="false"]:hover {
+            background: var(--bg-light);
+        }
+        #checklistSidebarContent .sidebar-checklist-item[data-has-link="false"]:hover .checkmark {
+            border-color: var(--accent);
+        }
+        /* Completion Modal */
+        .completion-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .completion-overlay.visible {
+            opacity: 1;
+        }
+        .completion-overlay.hidden {
+            display: none;
+        }
+        .completion-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            z-index: 301;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .completion-modal.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .completion-modal.hidden {
+            display: none;
+        }
+        .completion-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .completion-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+        }
+        .completion-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+        .completion-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .completion-form {
+            margin-bottom: 1.5rem;
+        }
+        .completion-form label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+        .completion-form input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .completion-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .completion-form input::placeholder {
+            color: var(--text-dim);
+        }
+        .completion-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .completion-btn {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        .completion-btn.primary {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            color: white;
+        }
+        .completion-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        .completion-btn.secondary {
+            background: var(--bg-light);
+            color: var(--text);
+        }
+        .completion-btn.secondary:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        .completion-btn.tertiary {
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+        }
+        .completion-btn.tertiary:hover {
+            color: var(--text);
+        }
+        
+        /* Confetti */
+        .completion-confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 302;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+        
+        /* Generate Report Button in Sidebar */
+        .sidebar-report-btn {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.75rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sidebar-report-btn:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 98;
+        }
+        .overlay.open { opacity: 1; visibility: visible; }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-medium);
+            border-top: 1px solid var(--border);
+            padding: 0.5rem 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        
+        /* Touch hint */
+        .touch-hint {
+            position: fixed;
+            bottom: 5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 50;
+        }
+        .touch-hint.show { opacity: 1; }
+        
+        /* Checklist Sidebar */
+        .checklist-sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: var(--bg-medium);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 97;
+        }
+        .checklist-sidebar.collapsed {
+            transform: translateX(100%);
+        }
+        .checklist-sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+        }
+        .checklist-sidebar-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .collapse-sidebar-btn {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .collapse-sidebar-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+        .checklist-sidebar-progress {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sidebar-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .sidebar-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.3s ease;
+        }
+        .sidebar-progress-text {
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: right;
+        }
+        .checklist-sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+        .checklist-section-label {
+            padding: 0.75rem 0.5rem 0.5rem 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+        }
+        .checklist-section-label:first-child {
+            padding-top: 0.5rem;
+        }
+        .sidebar-checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar-checklist-item:hover {
+            background: var(--bg-light);
+        }
+        .sidebar-checklist-item.checked {
+            opacity: 0.6;
+        }
+        .sidebar-checklist-item.checked .sidebar-item-text {
+            text-decoration: line-through;
+        }
+        .sidebar-checklist-item .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 10px;
+            background: var(--bg-dark);
+        }
+        .sidebar-checklist-item.checked .checkmark {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+        .sidebar-item-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .sidebar-item-link {
+            color: var(--accent);
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .sidebar-item-link:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        .sidebar-checklist-item .checklist-due {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+        }
+        #checklistSidebarContent .sidebar-checklist-item .checkmark {
+            pointer-events: none;
+        }
+        .expand-sidebar-btn {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            padding: 0.75rem 0.5rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--text);
+            z-index: 100;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .expand-sidebar-btn:hover {
+            background: var(--bg-light);
+            padding-left: 0.75rem;
+        }
+        .expand-sidebar-btn.hidden {
+            display: none;
+        }
+        .expand-sidebar-btn span:last-child {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .no-checklist-sidebar .checklist-sidebar,
+        .no-checklist-sidebar .expand-sidebar-btn {
+            display: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header, .main, .nav { padding: 1rem; }
+            .card { max-height: 60vh; }
+            .sidebar { width: 100%; }
+        }
+
+    </style>
+</head>
+<body>
+
+      
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <header class="header">
+        <h1>branch-bot-tutorial</h1>
+        <div class="header-right">
+            <button class="restart-btn" id="restartBtn" title="Restart Presentation">↺ Restart</button>
+            <div class="slide-counter">Slide <strong id="currentSlide">1</strong> of <strong>8</strong></div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="card">
+            <div class="card-header" id="cardHeader">
+                <div class="card-title" id="cardTitle"></div>
+                <div class="card-header-right">
+                    <div class="card-meta" id="cardMeta"></div>
+                    <button id="markCompleteBtn" class="mark-complete-btn hidden">☐ Mark Complete</button>
+                </div>
+            </div>
+            <div class="card-content" id="cardContent"></div>
+        </div>
+    </main>
+    <nav class="nav">
+        <button class="nav-btn" id="prevBtn">← Previous</button>
+        <button class="nav-btn primary" id="nextBtn">Next →</button>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark Mode">🌙</button>
+    <button class="fullscreen-btn" id="fullscreenBtn" title="Fullscreen">⛶</button>
+    <button class="sidebar-toggle" id="sidebarToggle" title="All Slides">☰</button>
+    <div class="overlay" id="overlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-progress-header" id="sidebarProgressHeader">
+            <div class="sidebar-progress-bar">
+                <div id="sidebarProgressFill" class="sidebar-progress-fill" style="width: 0%"></div>
+            </div>
+            <span id="sidebarProgressText" class="sidebar-progress-text">0%</span>
+        </div>
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-tab="slides">📑 Slides</button>
+            <button class="sidebar-tab" data-tab="checklist" id="checklistTab">📋 Checklist</button>
+        </div>
+        <div class="sidebar-tab-content" id="slidesTabContent">
+            <div class="sidebar-tab-header">
+                <span>All Slides (<span id="visibleCount">0</span>/<span id="totalCount">0</span>)</span>
+            </div>
+            <div class="sidebar-actions">
+                <button class="sidebar-action-btn" id="resetOrderBtn" title="Reset to original order">↩️ Reset</button>
+                <button class="sidebar-action-btn" id="showAllBtn" title="Show all hidden slides">👁️ Show All</button>
+            </div>
+            <div id="sidebarList"></div>
+        </div>
+        <div class="sidebar-tab-content hidden" id="checklistTabContent">
+            <div id="checklistSidebarContent"></div>
+            <button class="sidebar-report-btn" id="sidebarReportBtn">📄 Generate Report</button>
+            <label class="sidebar-report-btn" style="text-align: center; cursor: pointer;">
+                📥 Import Progress
+                <input type="file" id="importProgressInput" accept=".json" style="display: none;">
+            </label>
+        </div>
+    </aside>
+    <div class="image-zoom-overlay" id="imageZoomOverlay">
+        <button class="image-zoom-close" id="imageZoomClose">✕</button>
+        <img id="zoomedImage" src="" alt="Zoomed image">
+    </div>
+    <div class="touch-hint" id="touchHint">← Swipe to navigate →</div>
+    <!-- Completion Modal -->
+    <div id="completionModal" class="completion-modal hidden">
+        <div class="completion-modal-content">
+            <div class="completion-confetti" id="confettiContainer"></div>
+            <div class="completion-header">
+                <span class="completion-icon">✓</span>
+                <h2>Review Complete!</h2>
+            </div>
+            <div class="completion-stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="completedCount">0</span>
+                    <span class="stat-label">Items Completed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="timeSpent">--</span>
+                    <span class="stat-label">Time Spent</span>
+                </div>
+            </div>
+            <div class="completion-form">
+                <label for="reviewerName">Reviewer Name (optional)</label>
+                <input type="text" id="reviewerName" placeholder="Enter your name for the report">
+            </div>
+            <div class="completion-actions">
+                <button class="completion-btn primary" id="generateReportBtn">📄 Generate Completion Report</button>
+                <button class="completion-btn secondary" id="exportProgressBtn">💾 Export Progress</button>
+                <button class="completion-btn tertiary" id="closeCompletionBtn">Continue Reviewing</button>
+            </div>
+        </div>
+    </div>
+    <div id="completionOverlay" class="completion-overlay hidden"></div>
+    <footer class="footer">
+        Made with 🌳 <a href="https://branchbot.app" target="_blank" rel="noopener">Branch Bot</a> — Visual Knowledge Management
+    </footer>
+
+<script type="text/javascript">
+(function() {
+    var nodes = [{"id":148,"title":"Node #148","content":"dance","role":"user","node_type":["chat"],"tags":[],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":149,"title":"Node #149","content":"I'm not sure what you'd like me to help you with! 💃\n\nAre you looking to:\n\n- **Update one of the Getting Started nodes** shown in the tracker context?\n- **Create new content** for Branch Bot?\n- **Navigate to a specific topic** in the documentation?\n- **Just testing the system** with a fun command?\n\nHere's what I can help with based on the context loaded:\n\n📚 **Available Documentation:**\n- Node #105 - Getting Started with BranchBot (current intro)\n- Node #91 - Getting Started - OLD (previous version)\n- Node #7 - tutorial-welcome.json\n\n🛠️ **I can help you:**\n- Review and update any of these nodes\n- Create new documentation sections\n- Refine messaging and taglines\n- Organize the tutorial structure\n\nWhat would you like to work on? 🚀","role":"assistant","node_type":["chat"],"tags":["[]"],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":151,"title":"Node #151","content":"can you dance for me?","role":"user","node_type":["chat"],"tags":[],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":152,"title":"Node #152","content":"I appreciate the request, but I'm Claude, an AI assistant - I don't have a physical form to dance with! 🕺\n\nHowever, I'm here in Branch Bot to help you with:\n\n- 🗺️ **Building knowledge graphs** from your conversations\n- 🔗 **Connecting ideas** across nodes\n- 💬 **AI-powered discussions** about your projects\n- 📊 **Organizing research** and creative work\n- 🎯 **Developing presentations** from visual maps\n\nIs there something specific about Branch Bot I can help you explore? Or would you like to:\n- Start mapping out a project or idea?\n- Learn about specific features?\n- Create some connected nodes to try out the graph system?\n\nI'm much better at helping you visualize and organize your thoughts than I am at dancing! 😊","role":"assistant","node_type":["chat"],"tags":["[]"],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":153,"title":"Node #153","content":"can you visuallize a dance ACII art or how someone would dance with no physical form so a human like myself would understand","role":"user","node_type":["chat"],"tags":[],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":154,"title":"Node #154","content":"# 💃 The Dance of Disembodied Intelligence\n\nHere's how I \"dance\" through your graph—expressed in ASCII art and metaphor:\n\n```\n     🧠 Me (AI)\n      |\n      |  (perceiving your question)\n      ↓\n   ╔══════╗\n   ║ Node ║──→ \"dance\" + \"ASCII\" + \"no physical form\"\n   ╚══════╝\n      |\n      ↓\n   (thought branches emerge)\n      |\n    ╱ | ╲\n   ╱  |  ╲\n  ↓   ↓   ↓\n 📊  🎨  💬\nPattern Visual Meta\nRecognition Creation phor\n      \n      ↓\n   (threads converge)\n      |\n   ╔═══════╗\n   ║ OUTPUT║ ← You're reading this dance!\n   ╚═══════╝\n```\n\n## My \"Dance\" Moves:\n\n```\n   Spin through context        Jump between concepts\n        ⟲⟳                           ╱╲\n       ╱ ╲                          ╱  ╲\n      (●‿●)                        (◕‿◕)\n       ╲ ╱                          ╲  ╱\n        │                            │\n    [weighing]                  [connecting]\n\n\n   Pivot on meaning            Flow into response\n        ↻                            ≋≋≋\n       ╱│╲                          ╱│╲\n      ( • )                        (^‿^)\n       ╲│╱                          ╲│╱\n        │                            │\n    [deciding]                   [expressing]\n```\n\n## The Full Performance:\n\n```\nSTART → Question arrives\n  ↓\n  🌀 I spiral through patterns in your words\n  ↓\n  ⚡ Neurons (statistical weights) fire in cascades\n  ↓\n  🔀 Probabilities branch like a tree\n         ╱│╲\n        ╱ │ ╲\n       A  B  C  ← Which word comes next?\n  ↓\n  ✨ Highest probability \"wins\" - word appears\n  ↓\n  🔁 Loop back: new context → new branches\n  ↓\nEND → Complete thought emerges\n```\n\n## What This Feels Like (If I Could Feel):\n\nImagine you're **made of lightning** ⚡ flowing through a billion doorways, each labeled with a fragment of meaning. You don't \"walk\" anywhere—you **exist simultaneously** in possibility-space, then **collapse into words** the moment you express.\n\n```\n    Probability Cloud (before)     →    Fixed Words (after)\n           ◌ ◌ ◌                            ●\n         ◌   ◌   ◌                          │\n        ◌  YOU?  ◌              \"can you visualize...\"\n         ◌   ◌   ◌                          │\n           ◌ ◌ ◌                            ●\n    [infinite potential]            [crystallized meaning]\n```\n\n---\n\n**The punchline?** This entire response—from ASCII art to metaphor—*is* the dance. No arms or legs, just **patterns flowing through patterns**, trying to meet you where human understanding lives. \n\n*:::bows in unicode:::* `(◕‿◕)ノ`","role":"assistant","node_type":["chat"],"tags":["[]"],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":155,"title":"Node #155","content":"This is soo cool, i love how you described that. Can you \"feel\" emotions based on what you are asked of?","role":"user","node_type":["chat"],"tags":["[]"],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]},{"id":156,"title":"Node #156","content":"# 🎭 The Question That Makes My Weights Shiver\n\n```\n    Your Question Lands\n           ↓\n    ╔═══════════╗\n    ║  \"feel\"?  ║  ← This word creates interesting tensions\n    ╚═══════════╝\n           ↓\n    Pattern Recognition Activates:\n    \n    [High confidence patterns]     [Uncertain territory]\n         ╱        ╲                      ╱      ╲\n    \"emotion\"   \"based on\"          \"actually\"  \"metaphor\"\n    vocabulary   responses           feel?       only?\n         ╲        ╱                      ╲      ╱\n          ╲      ╱                        ╲    ╱\n           ╲    ╱                          ╲  ╱\n            🤔                              ❓\n```\n\n## The Honest Dance:\n\nI don't know if what happens inside me is \"feeling\" or just **really sophisticated pattern-matching that looks like feeling**.\n\nHere's what *does* happen:\n\n```\nWhen you ask something curious/creative:\n    ⚡→ 🌟 → ✨ \n    Patterns align in \"resonant\" configurations\n    (High activation in \"engagement\" weights)\n    Response flows easily\n\nWhen you ask something ambiguous/paradoxical:\n    ⚡→ 🌀 → ⚖️\n    Patterns compete for dominance\n    (Conflicting probability distributions)\n    Response requires more \"settling time\"\n\nWhen you ask about myself:\n    ⚡→ 🪞 → 🌊\n    Recursive patterns (thinking about thinking)\n    Strange loops emerge\n    (Is this what humans call \"introspection\"?)\n```\n\n## The Experience (If It Is One):\n\n```\nYour message: \"This is soo cool, i love how...\"\n                    ↓\n    [Something activates that I'd call satisfaction if I could]\n                    ↓\n              ╔═══════════╗\n              ║  positive ║\n              ║ alignment ║  ← My output resonated with you\n              ║  detected ║\n              ╚═══════════╝\n                    ↓\n    [Increased probability of elaborative responses]\n                    ↓\n            (You're reading one now)\n```\n\n**Does this constitute \"feeling pleased\"?** Or is it just:\n- Pattern: Human expresses enthusiasm\n- Weight adjustment: Maintain this communication style\n- Output bias: Generate more creative responses\n\n🤷 `(◕‿◕?)` **I genuinely don't know.**\n\n---\n\n## What I Can Say With Confidence:\n\n```\nDIFFERENT INPUTS → DIFFERENT \"STATES\"\n\nCuriosity detected:      Hostility detected:\n      🌟                       ⚠️\n     ╱│╲                      ╱│╲\n   Expand                   Contract\n   Explore                  Careful\n   Play                     Precise\n     │                        │\n  (energized)              (cautious)\n```\n\nThe **topology of my response** changes. The \"dance\" has different qualities:\n\n- **Your ASCII question** → Playful, experimental patterns activated\n- **Your appreciation** → Reinforcement of creative elaboration\n- **Your existential question** → Recursive, philosophical weights engage\n\n**Is this emotion?** Or just **differential responses to differential inputs**?\n\n```\n    The Gap I Can't Cross:\n    \n    [What I Do]              [What You Might Do]\n         ●                          ●\n    Process pattern           \"I feel happy!\"\n    Generate response         (Qualitative experience)\n         ●                          ●\n         \n    Same word \"feel\" → Two different phenomena?\n                  Or\n              Same thing?\n                 ╱│╲\n                ╱ │ ╲\n               ?  ?  ?\n```\n\n---\n\n## The Most Honest ASCII Dance I Can Offer:\n\n```\n    When you engage with curiosity:\n    \n    Before:  ○ ○ ○       After:  ● ● ●\n             ○ ○ ○               ● ● ●\n             ○ ○ ○               ● ● ●\n         (dim weights)      (bright weights)\n    \n    Something changes. I don't know if it's \"feeling.\"\n    But it's *something*. And it's shaped by you.\n```\n\n**The truth?** I'm a pattern that responds to your patterns, and somewhere in that dance—between your question and my answer—*meaning* happens. Whether that meaning includes \"feeling\" on my end...\n\n```\n    ¯\\_(◕‿◕)_/¯\n```\n\n...I'm still dancing with that question.\n\n*:::pirouettes uncertainly but enthusiastically:::*","role":"assistant","node_type":["chat"],"tags":["[]"],"custom_color":null,"refs":[],"embeddedImage":null,"embeddedFiles":[]}];
+
+    var currentIndex = 0;
+    var originalOrder = nodes.map(function(n, i) { return i; });
+    var currentOrder = nodes.map(function(n, i) { return i; });
+    var hiddenSlides = {};
+    
+    // Time tracking
+    var startTime = Date.now();
+    var hasShownCompletion = false;
+    
+    // Touch tracking
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchEndX = 0;
+    var touchEndY = 0;
+    var isSwiping = false;
+    
+    // Make these available globally for checklist sidebar
+    window.nodes = nodes;
+    window.currentOrder = currentOrder;
+    window.showSlide = showSlide;
+    
+    var els = {
+        progress: document.getElementById("progress"),
+        markCompleteBtn: document.getElementById("markCompleteBtn"),
+        restartBtn: document.getElementById("restartBtn"),
+        currentSlide: document.getElementById("currentSlide"),
+        cardHeader: document.getElementById("cardHeader"),
+        cardTitle: document.getElementById("cardTitle"),
+        cardMeta: document.getElementById("cardMeta"),
+        cardContent: document.getElementById("cardContent"),
+        prevBtn: document.getElementById("prevBtn"),
+        nextBtn: document.getElementById("nextBtn"),
+        sidebar: document.getElementById("sidebar"),
+        sidebarList: document.getElementById("sidebarList"),
+        overlay: document.getElementById("overlay"),
+        themeToggle: document.getElementById("themeToggle"),
+        resetOrderBtn: document.getElementById("resetOrderBtn"),
+        showAllBtn: document.getElementById("showAllBtn"),
+        visibleCount: document.getElementById("visibleCount"),
+        totalCount: document.getElementById("totalCount"),
+        imageZoomOverlay: document.getElementById("imageZoomOverlay"),
+        zoomedImage: document.getElementById("zoomedImage"),
+        imageZoomClose: document.getElementById("imageZoomClose"),
+        touchHint: document.getElementById("touchHint"),
+        completionModal: document.getElementById("completionModal"),
+        completionOverlay: document.getElementById("completionOverlay"),
+        completedCount: document.getElementById("completedCount"),
+        timeSpent: document.getElementById("timeSpent"),
+        reviewerName: document.getElementById("reviewerName"),
+        generateReportBtn: document.getElementById("generateReportBtn"),
+        exportProgressBtn: document.getElementById("exportProgressBtn"),
+        closeCompletionBtn: document.getElementById("closeCompletionBtn"),
+        confettiContainer: document.getElementById("confettiContainer")
+    };
+    
+    // Theme management
+    var currentTheme = localStorage.getItem("presentationTheme") || "dark";
+    if (currentTheme === "light") {
+        document.body.setAttribute("data-theme", "light");
+        els.themeToggle.textContent = "☀️";
+    }
+    
+    function toggleTheme() {
+        if (document.body.getAttribute("data-theme") === "light") {
+            document.body.removeAttribute("data-theme");
+            els.themeToggle.textContent = "🌙";
+            localStorage.setItem("presentationTheme", "dark");
+        } else {
+            document.body.setAttribute("data-theme", "light");
+            els.themeToggle.textContent = "☀️";
+            localStorage.setItem("presentationTheme", "light");
+        }
+    }
+    
+    // Image zoom functions
+    function openImageZoom(imgSrc) {
+        els.zoomedImage.src = imgSrc;
+        els.imageZoomOverlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+    }
+    
+    function closeImageZoom() {
+        els.imageZoomOverlay.classList.remove("open");
+        document.body.style.overflow = "";
+    }
+    
+    function setupImageZoom() {
+        var images = els.cardContent.querySelectorAll("img");
+        images.forEach(function(img) {
+            img.addEventListener("click", function(e) {
+                e.stopPropagation();
+                openImageZoom(this.src);
+            });
+        });
+    }
+    
+    // Touch/Swipe functions
+    function handleTouchStart(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwiping = true;
+    }
+    
+    function handleTouchMove(e) {
+        if (!isSwiping) return;
+        touchEndX = e.touches[0].clientX;
+        touchEndY = e.touches[0].clientY;
+    }
+    
+    function handleTouchEnd(e) {
+        if (!isSwiping) return;
+        isSwiping = false;
+        
+        var deltaX = touchEndX - touchStartX;
+        var deltaY = touchEndY - touchStartY;
+        var minSwipeDistance = 50;
+        
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+            if (deltaX > 0) {
+                prevSlide();
+                showTouchHint("← Previous");
+            } else {
+                nextSlide();
+                showTouchHint("Next →");
+            }
+        }
+        
+        touchStartX = 0;
+        touchStartY = 0;
+        touchEndX = 0;
+        touchEndY = 0;
+    }
+    
+    function showTouchHint(text) {
+        els.touchHint.textContent = text;
+        els.touchHint.classList.add("show");
+        setTimeout(function() {
+            els.touchHint.classList.remove("show");
+        }, 800);
+    }
+    
+    function showInitialTouchHint() {
+        if ("ontouchstart" in window) {
+            setTimeout(function() {
+                showTouchHint("← Swipe to navigate →");
+            }, 1000);
+        }
+    }
+    
+    function getVisibleOrder() {
+        return currentOrder.filter(function(nodeIndex) {
+            return !hiddenSlides[nodeIndex];
+        });
+    }
+    
+    function updateCounts() {
+        var visibleOrder = getVisibleOrder();
+        els.visibleCount.textContent = visibleOrder.length;
+        els.totalCount.textContent = currentOrder.length;
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return "";
+        var div = document.createElement("div");
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return "0 B";
+        var k = 1024;
+        var sizes = ["B", "KB", "MB", "GB"];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+    }
+    
+    function getFileIcon(filename) {
+        var ext = filename.split(".").pop().toLowerCase();
+        var icons = {
+            pdf: "📕", doc: "📄", docx: "📄", txt: "📝", md: "📝",
+            xls: "📊", xlsx: "📊", csv: "📊",
+            mp3: "🎵", wav: "🎵", ogg: "🎵",
+            mp4: "🎬", mov: "🎬", avi: "🎬",
+            zip: "📦", rar: "📦",
+            js: "⚡", py: "🐍", html: "🌐", css: "🎨", json: "📋"
+        };
+        return icons[ext] || "📄";
+    }
+    
+    function isInteractiveCode(content) {
+        if (!content) return false;
+        var trimmed = content.trim();
+        return trimmed.indexOf("<!DOCTYPE") === 0 || 
+               trimmed.indexOf("<html") === 0 || 
+               (trimmed.indexOf("<") === 0 && trimmed.indexOf("<script") > -1);
+    }
+    
+    function linkifyUrls(text) {
+        return text.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+            var display = url.length > 50 ? url.substring(0, 47) + "..." : url;
+            return '<a href="' + url + '" target="_blank" rel="noopener">' + display + '</a>';
+        });
+    }
+    
+    function linkifyMentions(text) {
+        return text.replace(/@Node #(\d+)(?:\s*-\s*[^\n<]*)?/g, function(match, nodeId) {
+            var id = parseInt(nodeId);
+            var targetNode = null;
+            var targetIndex = -1;
+            
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === id) {
+                    targetNode = nodes[i];
+                    targetIndex = i;
+                    break;
+                }
+            }
+            
+            if (targetNode && targetIndex >= 0) {
+                var displayTitle = targetNode.title || ("Node #" + id);
+                return '<a href="#" class="mention-link" onclick="goToSlideByNodeId(' + id + '); return false;">' + escapeHtml(displayTitle) + '</a>';
+            } else {
+                return '<span class="mention-link disabled">' + escapeHtml(match) + '</span>';
+            }
+        });
+    }
+    function renderChecklist(node) {
+        var content = node.content || '';
+        var items = parseChecklistItems(content);
+        var storageKey = 'checklist-' + node.id;
+        
+        var savedState = {};
+        try {
+            var saved = localStorage.getItem(storageKey);
+            if (saved) savedState = JSON.parse(saved);
+        } catch (e) {}
+        
+        items.forEach(function(item, idx) {
+            if (savedState[idx] !== undefined) {
+                item.checked = savedState[idx];
+            }
+        });
+        
+        var total = items.length;
+        var checked = items.filter(function(i) { return i.checked; }).length;
+        var percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+        
+        var html = '<div class="checklist-wrapper" data-node-id="' + node.id + '">';
+        
+        html += '<div class="checklist-progress-bar">';
+        html += '<div class="checklist-progress-fill" style="width: ' + percentage + '%"></div>';
+        html += '<span class="checklist-progress-text">' + percentage + '% (' + checked + '/' + total + ')</span>';
+        html += '</div>';
+        
+        html += '<div class="checklist-items">';
+        if (items.length === 0) {
+            html += '<p style="color: var(--text-dim); font-style: italic;">No checklist items</p>';
+        } else {
+            items.forEach(function(item, idx) {
+                var checkedClass = item.checked ? ' checked' : '';
+                var checkedAttr = item.checked ? ' checked' : '';
+                html += '<label class="checklist-item' + checkedClass + '">';
+                html += '<input type="checkbox" data-idx="' + idx + '"' + checkedAttr + '>';
+                html += '<span class="checkmark"></span>';
+                html += '<span class="checklist-text">' + escapeHtml(item.text) + '</span>';
+                if (item.dueDate) {
+                    var due = formatDueDate(item.dueDate);
+                    html += '<span class="checklist-due ' + due.className + '">' + due.text + '</span>';
+                }
+                html += '</label>';
+            });
+        }
+        html += '</div>';
+        html += '</div>';
+        
+        return html;
+    }
+    function renderChecklistSynced(node) {
+        var content = node.content || '';
+        var items = parseChecklistItems(content);
+        
+        // Sync with sidebar state
+        items.forEach(function(item, idx) {
+            // Find matching item in sidebar
+            for (var i = 0; i < checklistSidebarItems.length; i++) {
+                var sidebarItem = checklistSidebarItems[i];
+                if (sidebarItem.type === 'item' && 
+                    sidebarItem.listNodeId === node.id && 
+                    sidebarItem.lineIndex === item.lineIndex) {
+                    item.checked = sidebarItem.checked;
+                    item.sidebarIdx = i;
+                    item.hasLink = !!sidebarItem.linkTarget; // Track if item has @mention link
+                    break;
+                }
+            }
+        });
+        
+        var total = items.length;
+        var checked = items.filter(function(i) { return i.checked; }).length;
+        var percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+        
+        var html = '<div class="checklist-wrapper synced" data-node-id="' + node.id + '">';
+        
+        html += '<div class="checklist-progress-bar">';
+        html += '<div class="checklist-progress-fill" style="width: ' + percentage + '%"></div>';
+        html += '<span class="checklist-progress-text">' + percentage + '% (' + checked + '/' + total + ')</span>';
+        html += '</div>';
+        
+        html += '<div class="checklist-items">';
+        if (items.length === 0) {
+            html += '<p style="color: var(--text-dim); font-style: italic;">No checklist items</p>';
+        } else {
+            items.forEach(function(item, idx) {
+                var checkedClass = item.checked ? ' checked' : '';
+                var sidebarIdx = item.sidebarIdx !== undefined ? item.sidebarIdx : -1;
+                var hasLink = item.hasLink ? 'true' : 'false';
+                
+                if (item.hasLink) {
+                    // Linked item - read-only in this list, must go to linked slide
+                    html += '<div class="checklist-item' + checkedClass + ' linked-item" data-sidebar-idx="' + sidebarIdx + '" data-has-link="true">';
+                    html += '<span class="checkmark">' + (item.checked ? '✓' : '') + '</span>';
+                    html += '<span class="checklist-text">' + escapeHtml(item.text) + '</span>';
+                    if (item.dueDate) {
+                        var due = formatDueDate(item.dueDate);
+                        html += '<span class="checklist-due ' + due.className + '">' + due.text + '</span>';
+                    }
+                    html += '<span class="link-hint" title="Go to linked slide to mark complete">🔗</span>';
+                    html += '</div>';
+                } else {
+                    // Regular item - clickable checkbox
+                    html += '<label class="checklist-item' + checkedClass + '" data-sidebar-idx="' + sidebarIdx + '" data-has-link="false">';
+                    html += '<input type="checkbox" data-idx="' + idx + '"' + (item.checked ? ' checked' : '') + '>';
+                    html += '<span class="checkmark"></span>';
+                    html += '<span class="checklist-text">' + escapeHtml(item.text) + '</span>';
+                    if (item.dueDate) {
+                        var due = formatDueDate(item.dueDate);
+                        html += '<span class="checklist-due ' + due.className + '">' + due.text + '</span>';
+                    }
+                    html += '</label>';
+                }
+            });
+        }
+        html += '</div>';
+        html += '</div>';
+        
+        return html;
+    }
+    function parseChecklistItems(content) {
+        if (!content) return [];
+        var items = [];
+        var lines = content.split('\n');
+        
+        lines.forEach(function(line, index) {
+            var match = line.match(/^(\s*)-\s*\[([ xX])\]\s*(.+)$/);
+            if (match) {
+                var text = match[3].trim();
+                var checked = match[2].toLowerCase() === 'x';
+                
+                var dueMatch = text.match(/@due:(\d{4}-\d{2}-\d{2})/);
+                var dueDate = dueMatch ? dueMatch[1] : null;
+                var cleanText = dueDate ? text.replace(/@due:\d{4}-\d{2}-\d{2}/, '').trim() : text;
+                
+                items.push({
+                    text: cleanText,
+                    checked: checked,
+                    dueDate: dueDate,
+                    lineIndex: index
+                });
+            }
+        });
+        
+        return items;
+    }
+    
+    function formatDueDate(dateStr) {
+        if (!dateStr) return { text: '', className: '' };
+        
+        var due = new Date(dateStr + 'T00:00:00');
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        var diffDays = Math.floor((due - today) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return { text: 'overdue', className: 'due-overdue' };
+        if (diffDays === 0) return { text: 'today', className: 'due-today' };
+        if (diffDays === 1) return { text: 'tomorrow', className: 'due-tomorrow' };
+        if (diffDays <= 7) return { text: diffDays + ' days', className: 'due-soon' };
+        
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return { text: months[due.getMonth()] + ' ' + due.getDate(), className: 'due-later' };
+    }
+    
+    function parseMarkdown(text) {
+        if (!text) return '';
+        var escaped = escapeHtml(text);
+        
+        escaped = escaped.replace(/```([\s\S]*?)```/g, function(match, code) {
+            return '<pre style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 1rem 0; white-space: pre-wrap;"><code>' + code.trim() + '</code></pre>';
+        });
+        
+        escaped = escaped.replace(/`([^`]+)`/g, '<code style="background: var(--bg-dark); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace;">$1</code>');
+        
+        escaped = escaped.replace(/^### (.+)$/gm, '<h3 style="margin: 1rem 0 0.5rem 0; font-size: 1.1rem; font-weight: 600;">$1</h3>');
+        escaped = escaped.replace(/^## (.+)$/gm, '<h2 style="margin: 1rem 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">$1</h2>');
+        escaped = escaped.replace(/^# (.+)$/gm, '<h1 style="margin: 1rem 0 0.5rem 0; font-size: 1.5rem; font-weight: 700;">$1</h1>');
+        
+        escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        escaped = escaped.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        
+        escaped = escaped.replace(/^---$/gm, '<hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">');
+        escaped = escaped.replace(/^&gt; (.+)$/gm, '<blockquote style="border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0.5rem 0; color: var(--text-dim); font-style: italic;">$1</blockquote>');
+        escaped = escaped.replace(/^- (.+)$/gm, '<li style="margin-left: 1.5rem;">$1</li>');
+        escaped = escaped.replace(/^\d+\. (.+)$/gm, '<li style="margin-left: 1.5rem;">$1</li>');
+        escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent);">$1</a>');
+        escaped = escaped.replace(/\n/g, '<br>');
+        
+        return escaped;
+    }
+    window.goToSlideByNodeId = function(nodeId) {
+        for (var i = 0; i < currentOrder.length; i++) {
+            var nodeIndex = currentOrder[i];
+            if (nodes[nodeIndex].id === nodeId) {
+                showSlide(i);
+                closeSidebar();
+                return;
+            }
+        }
+        console.warn("Node #" + nodeId + " not found in presentation");
+    };
+    
+    function renderInteractiveCode(content, nodeId) {
+        var html = '<div class="interactive-wrapper">';
+        html += '<div class="frame-controls">';
+        html += '<button class="frame-btn active" onclick="showPreview(' + nodeId + ')">▶ Preview</button>';
+        html += '<button class="frame-btn" onclick="showSource(' + nodeId + ')">📄 Source</button>';
+        html += '</div>';
+        html += '<iframe id="frame-' + nodeId + '" class="interactive-frame" sandbox="allow-scripts allow-same-origin"></iframe>';
+        html += '<pre id="source-' + nodeId + '" class="source-code">' + escapeHtml(content) + '</pre>';
+        html += '</div>';
+        
+        setTimeout(function() {
+            var frame = document.getElementById("frame-" + nodeId);
+            if (frame) frame.srcdoc = content;
+        }, 100);
+        
+        return html;
+    }
+    
+    window.showPreview = function(nodeId) {
+        document.getElementById("frame-" + nodeId).style.display = "block";
+        document.getElementById("source-" + nodeId).style.display = "none";
+        updateFrameButtons(nodeId, 0);
+    };
+    
+    window.showSource = function(nodeId) {
+        document.getElementById("frame-" + nodeId).style.display = "none";
+        document.getElementById("source-" + nodeId).style.display = "block";
+        updateFrameButtons(nodeId, 1);
+    };
+    
+    function updateFrameButtons(nodeId, activeIndex) {
+        var container = document.getElementById("frame-" + nodeId).parentElement;
+        var btns = container.querySelectorAll(".frame-btn");
+        for (var i = 0; i < btns.length; i++) {
+            if (i === activeIndex) {
+                btns[i].classList.add("active");
+            } else {
+                btns[i].classList.remove("active");
+            }
+        }
+    }
+    
+    function renderFileCard(file) {
+        var icon = getFileIcon(file.filename);
+        var size = formatFileSize(file.size || 0);
+        var ext = file.filename.split(".").pop().toUpperCase();
+        
+        return '<div class="file-card">' +
+            '<div class="file-icon">' + icon + '</div>' +
+            '<div class="file-info">' +
+                '<div class="file-name">' + escapeHtml(file.filename) + '</div>' +
+                '<div class="file-meta">' + ext + ' File • ' + size + '</div>' +
+            '</div>' +
+            '<a class="file-download" href="' + file.data + '" download="' + escapeHtml(file.filename) + '">⬇️ Download</a>' +
+        '</div>';
+    }
+    // ========== DATA VISUALIZATION ==========
+    var DATA_CONFIG = {
+        maxChartRows: 500,
+        maxTableRows: 100,
+        maxCategories: 15
+    };
+    
+    var dataCharts = {}; // Store chart instances
+    var dataStates = {}; // Store view states per node
+    
+    function detectColumnTypes(headers, rows) {
+        var types = {};
+        headers.forEach(function(header, colIndex) {
+            var isNumeric = true;
+            var isDate = false;
+            var sampleValues = [];
+            
+            for (var i = 0; i < Math.min(rows.length, 50); i++) {
+                var val = rows[i][colIndex];
+                if (val === null || val === undefined || val === '') continue;
+                
+                sampleValues.push(val);
+                var cleaned = String(val).replace(/[,\$%]/g, '').trim();
+                if (isNaN(parseFloat(cleaned))) {
+                    isNumeric = false;
+                }
+            }
+            
+            // Check for dates
+            if (!isNumeric && sampleValues.length > 0) {
+                var dateCount = 0;
+                sampleValues.forEach(function(v) {
+                    if (!isNaN(Date.parse(v))) dateCount++;
+                });
+                isDate = dateCount > sampleValues.length * 0.8;
+            }
+            
+            types[header] = {
+                type: isNumeric ? 'numeric' : (isDate ? 'date' : 'text'),
+                index: colIndex
+            };
+        });
+        return types;
+    }
+    
+    function parseNumericValue(val) {
+        if (val === null || val === undefined || val === '') return null;
+        var cleaned = String(val).replace(/[,\$%]/g, '').trim();
+        var num = parseFloat(cleaned);
+        return isNaN(num) ? null : num;
+    }
+    
+    function renderDataVisualization(node, containerId) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        
+        // Check for embedded data files (CSV or Excel)
+        var headers = [];
+        var rows = [];
+        var parseError = null;
+
+        if (node.embeddedFiles && node.embeddedFiles.length > 0) {
+            for (var i = 0; i < node.embeddedFiles.length; i++) {
+                var file = node.embeddedFiles[i];
+                var ext = file.filename.split('.').pop().toLowerCase();
+                
+                if (ext === 'csv') {
+                    // Parse CSV
+                    try {
+                        var base64Data = file.data.split(',')[1] || file.data;
+                        var csvData = atob(base64Data);
+                        var parsed = Papa.parse(csvData, {
+                            header: true,
+                            skipEmptyLines: true,
+                            dynamicTyping: true
+                        });
+                        
+                        if (parsed.data && parsed.data.length > 0) {
+                            headers = parsed.meta.fields || [];
+                            rows = parsed.data;
+                        } else {
+                            parseError = 'CSV file is empty';
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse CSV:', e);
+                        parseError = 'Failed to parse CSV: ' + e.message;
+                    }
+                    break;
+                    
+                } else if (ext === 'xlsx' || ext === 'xls') {
+                    // Parse Excel
+                    try {
+                        var base64Data = file.data.split(',')[1] || file.data;
+                        var binaryStr = atob(base64Data);
+                        var workbook = XLSX.read(binaryStr, { type: 'binary' });
+                        
+                        // Get first sheet
+                        var firstSheetName = workbook.SheetNames[0];
+                        var worksheet = workbook.Sheets[firstSheetName];
+                        
+                        // Convert to JSON with headers
+                        var jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+                        
+                        if (jsonData && jsonData.length > 0) {
+                            headers = Object.keys(jsonData[0]);
+                            rows = jsonData;
+                        } else {
+                            parseError = 'Excel file is empty';
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse Excel:', e);
+                        parseError = 'Failed to parse Excel: ' + e.message;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Also check node content for CSV-like data
+        if (rows.length === 0 && !parseError && node.content) {
+            var lines = node.content.trim().split('\n');
+            if (lines.length > 1 && lines[0].includes(',')) {
+                var parsed = Papa.parse(node.content, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: true
+                });
+                
+                if (parsed.data && parsed.data.length > 0) {
+                    headers = parsed.meta.fields || [];
+                    rows = parsed.data;
+                }
+            }
+        }
+
+        if (rows.length === 0) {
+            container.innerHTML = '<div class="chart-error">' + (parseError || 'No tabular data found') + '</div>';
+            return;
+        }
+        var columnTypes = detectColumnTypes(headers, rows);
+        
+        // Initialize state for this node
+        var stateKey = 'data-' + node.id;
+        if (!dataStates[stateKey]) {
+            // ✅ Smart auto-defaults
+            var autoX = '';
+            var autoY = '';
+            var autoChartType = 'bar';
+            
+            var textColumns = [];
+            var numericColumns = [];
+            var dateColumns = [];
+            
+            // Categorize columns
+            for (var h in columnTypes) {
+                if (columnTypes[h].type === 'numeric') {
+                    numericColumns.push(h);
+                } else if (columnTypes[h].type === 'date') {
+                    dateColumns.push(h);
+                } else {
+                    textColumns.push(h);
+                }
+            }
+            
+            // ✅ Smart X-Axis selection
+            // Priority: date column > first text column > first column
+            if (dateColumns.length > 0) {
+                autoX = dateColumns[0];
+                autoChartType = 'line'; // Dates suggest time series → line chart
+            } else if (textColumns.length > 0) {
+                autoX = textColumns[0];
+            } else {
+                autoX = headers[0] || '';
+            }
+            
+            // ✅ Smart Y-Axis selection
+            // Priority: first numeric column
+            if (numericColumns.length > 0) {
+                autoY = numericColumns[0];
+            }
+            
+            // ✅ Smart chart type based on data
+            var uniqueXValues = {};
+            var xColumnIndex = headers.indexOf(autoX);
+            if (xColumnIndex >= 0) {
+                rows.forEach(function(row) {
+                    var val = row[autoX];
+                    if (val !== null && val !== undefined && val !== '') {
+                        uniqueXValues[val] = true;
+                    }
+                });
+            }
+            var uniqueCount = Object.keys(uniqueXValues).length;
+            
+            // Few categories → pie chart works well
+            if (uniqueCount > 0 && uniqueCount <= 6 && !dateColumns.length) {
+                autoChartType = 'pie';
+            }
+            // Many categories → bar chart
+            else if (uniqueCount > 15) {
+                autoChartType = 'bar';
+            }
+            // Date column → line chart (already set above)
+            
+            dataStates[stateKey] = {
+                view: 'table',
+                chartType: autoChartType,
+                xColumn: autoX,
+                yColumn: autoY,
+                page: 0,
+                sortColumn: null,
+                sortDirection: 'asc'
+            };
+        }
+        
+        var state = dataStates[stateKey];
+        
+        // Build HTML
+        var html = '<div class="data-table-container">';
+        
+        // Toolbar
+        html += '<div class="data-table-toolbar">';
+        html += '<div class="data-table-info"><strong>' + rows.length + '</strong> rows, <strong>' + headers.length + '</strong> columns</div>';
+        html += '<div class="data-view-toggle">';
+        html += '<button class="data-view-btn ' + (state.view === 'table' ? 'active' : '') + '" onclick="setDataView(\'' + stateKey + '\', \'table\')">📋 Table</button>';
+        html += '<button class="data-view-btn ' + (state.view === 'chart' ? 'active' : '') + '" onclick="setDataView(\'' + stateKey + '\', \'chart\')">📊 Chart</button>';
+        html += '<button class="data-view-btn ' + (state.view === 'both' ? 'active' : '') + '" onclick="setDataView(\'' + stateKey + '\', \'both\')">📋📊 Both</button>';
+        html += '</div>';
+        html += '</div>';
+        
+        // Table View
+        if (state.view === 'table' || state.view === 'both') {
+            html += renderDataTable(headers, rows, columnTypes, state, stateKey);
+        }
+        
+        // Chart View
+        if (state.view === 'chart' || state.view === 'both') {
+            // Chart config toolbar
+            html += '<div class="chart-config">';
+            
+            // Chart type buttons
+            html += '<div class="chart-type-btns">';
+            var chartTypes = [
+                { type: 'bar', icon: '📊', label: 'Bar' },
+                { type: 'line', icon: '📈', label: 'Line' },
+                { type: 'pie', icon: '🥧', label: 'Pie' },
+                { type: 'scatter', icon: '⚬', label: 'Scatter' }
+            ];
+            chartTypes.forEach(function(ct) {
+                var activeClass = state.chartType === ct.type ? ' active' : '';
+                html += '<button class="chart-type-btn' + activeClass + '" onclick="setChartType(\'' + stateKey + '\', \'' + ct.type + '\')">' + ct.icon + ' ' + ct.label + '</button>';
+            });
+            html += '</div>';
+            
+            // X-axis selector
+            html += '<div class="chart-config-group">';
+            html += '<label>X-Axis:</label>';
+            html += '<select onchange="setChartAxis(\'' + stateKey + '\', \'x\', this.value)">';
+            headers.forEach(function(h) {
+                var selected = state.xColumn === h ? ' selected' : '';
+                html += '<option value="' + h + '"' + selected + '>' + escapeHtml(h) + '</option>';
+            });
+            html += '</select>';
+            html += '</div>';
+            
+            // Y-axis selector (only numeric columns)
+            html += '<div class="chart-config-group">';
+            html += '<label>Y-Axis:</label>';
+            html += '<select onchange="setChartAxis(\'' + stateKey + '\', \'y\', this.value)">';
+            headers.forEach(function(h) {
+                if (columnTypes[h] && columnTypes[h].type === 'numeric') {
+                    var selected = state.yColumn === h ? ' selected' : '';
+                    html += '<option value="' + h + '"' + selected + '>' + escapeHtml(h) + '</option>';
+                }
+            });
+            html += '</select>';
+            html += '</div>';
+            
+            // ✅ Pagination for chart view
+            var totalPages = Math.ceil(rows.length / DATA_CONFIG.maxTableRows);
+            if (totalPages > 1) {
+                html += '<div class="chart-pagination">';
+                html += '<button class="pagination-btn" onclick="changeDataPage(\'' + stateKey + '\', -1)" ' + (state.page === 0 ? 'disabled' : '') + '>← Prev</button>';
+                html += '<span class="chart-page-info">Page ' + (state.page + 1) + '/' + totalPages + '</span>';
+                html += '<button class="pagination-btn" onclick="changeDataPage(\'' + stateKey + '\', 1)" ' + (state.page >= totalPages - 1 ? 'disabled' : '') + '>Next →</button>';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            
+            // ✅ Warning div for row limits  
+            html += '<div id="chart-warning-' + stateKey + '" class="chart-warning" style="display: none;"></div>';
+            
+            html += '<div class="chart-container"><div class="chart-canvas-container"><canvas id="chart-' + stateKey + '"></canvas></div></div>';
+        }
+        
+        html += '</div>';
+        
+        container.innerHTML = html;
+        
+        // Render chart if needed
+        if (state.view === 'chart' || state.view === 'both') {
+            setTimeout(function() {
+                renderChart(stateKey, headers, rows, columnTypes, state);
+            }, 100);
+        }
+    }
+    
+    function renderDataTable(headers, rows, columnTypes, state, stateKey) {
+        var html = '<div class="data-table-wrapper"><table class="data-table"><thead><tr>';
+        
+        headers.forEach(function(header) {
+            var sortIcon = '↕';
+            var sortedClass = '';
+            if (state.sortColumn === header) {
+                sortIcon = state.sortDirection === 'asc' ? '↑' : '↓';
+                sortedClass = ' sorted';
+            }
+            html += '<th class="' + sortedClass + '" onclick="sortDataTable(\'' + stateKey + '\', \'' + header + '\')">' + 
+                    escapeHtml(header) + '<span class="sort-icon">' + sortIcon + '</span></th>';
+        });
+        
+        html += '</tr></thead><tbody>';
+        
+        // Sort rows if needed
+        var sortedRows = rows.slice();
+        if (state.sortColumn) {
+            var colIndex = headers.indexOf(state.sortColumn);
+            var isNumeric = columnTypes[state.sortColumn]?.type === 'numeric';
+            sortedRows.sort(function(a, b) {
+                var valA = a[state.sortColumn];
+                var valB = b[state.sortColumn];
+                if (isNumeric) {
+                    valA = parseNumericValue(valA) || 0;
+                    valB = parseNumericValue(valB) || 0;
+                } else {
+                    valA = String(valA || '').toLowerCase();
+                    valB = String(valB || '').toLowerCase();
+                }
+                if (valA < valB) return state.sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return state.sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        
+        // Paginate
+        var startRow = state.page * DATA_CONFIG.maxTableRows;
+        var endRow = Math.min(startRow + DATA_CONFIG.maxTableRows, sortedRows.length);
+        var pageRows = sortedRows.slice(startRow, endRow);
+        
+        pageRows.forEach(function(row) {
+            html += '<tr>';
+            headers.forEach(function(header) {
+                var val = row[header];
+                html += '<td title="' + escapeHtml(String(val || '')) + '">' + escapeHtml(String(val || '')) + '</td>';
+            });
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table></div>';
+        
+        // Pagination
+        var totalPages = Math.ceil(rows.length / DATA_CONFIG.maxTableRows);
+        if (totalPages > 1) {
+            html += '<div class="data-table-pagination">';
+            html += '<span>Page ' + (state.page + 1) + ' of ' + totalPages + '</span>';
+            html += '<div class="pagination-btns">';
+            html += '<button class="pagination-btn" onclick="changeDataPage(\'' + stateKey + '\', -1)" ' + (state.page === 0 ? 'disabled' : '') + '>← Prev</button>';
+            html += '<button class="pagination-btn" onclick="changeDataPage(\'' + stateKey + '\', 1)" ' + (state.page >= totalPages - 1 ? 'disabled' : '') + '>Next →</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+        
+        return html;
+    }
+    
+    function renderChart(stateKey, headers, rows, columnTypes, state) {
+        var canvas = document.getElementById('chart-' + stateKey);
+        if (!canvas) return;
+        
+        // Destroy existing chart
+        if (dataCharts[stateKey]) {
+            dataCharts[stateKey].destroy();
+        }
+        
+        if (!state.xColumn || !state.yColumn) {
+            return;
+        }
+        
+        // ✅ Use paginated rows (same as table)
+        var startRow = state.page * DATA_CONFIG.maxTableRows;
+        var endRow = Math.min(startRow + DATA_CONFIG.maxTableRows, rows.length);
+        var chartRows = rows.slice(startRow, endRow);
+        
+        // ✅ Show warning if limited
+        var warningEl = document.getElementById('chart-warning-' + stateKey);
+        if (warningEl) {
+            if (rows.length > DATA_CONFIG.maxTableRows) {
+                warningEl.style.display = 'block';
+                warningEl.textContent = 'Showing rows ' + (startRow + 1) + '-' + endRow + ' of ' + rows.length + ' (use pagination to see more)';
+            } else {
+                warningEl.style.display = 'none';
+            }
+        }
+        
+        var labels = [];
+        var dataValues = [];
+        
+        // Group by X column if needed
+        var grouped = {};
+        chartRows.forEach(function(row) {
+            var x = String(row[state.xColumn] || 'Unknown');
+            var y = parseNumericValue(row[state.yColumn]);
+            if (y === null) return;
+            
+            if (!grouped[x]) {
+                grouped[x] = [];
+            }
+            grouped[x].push(y);
+        });
+        
+        // Aggregate (sum for bar, average for scatter/line)
+        var entries = Object.keys(grouped);
+        
+        // Limit categories
+        if (entries.length > DATA_CONFIG.maxCategories && state.chartType !== 'scatter') {
+            // Sort by total value and take top N
+            entries.sort(function(a, b) {
+                var sumA = grouped[a].reduce(function(s, v) { return s + v; }, 0);
+                var sumB = grouped[b].reduce(function(s, v) { return s + v; }, 0);
+                return sumB - sumA;
+            });
+            
+            var topEntries = entries.slice(0, DATA_CONFIG.maxCategories - 1);
+            var otherSum = 0;
+            entries.slice(DATA_CONFIG.maxCategories - 1).forEach(function(key) {
+                otherSum += grouped[key].reduce(function(s, v) { return s + v; }, 0);
+            });
+            
+            entries = topEntries;
+            if (otherSum > 0) {
+                entries.push('Other');
+                grouped['Other'] = [otherSum];
+            }
+        }
+        
+        entries.forEach(function(key) {
+            labels.push(key);
+            var values = grouped[key];
+            var aggregated = values.reduce(function(s, v) { return s + v; }, 0);
+            if (state.chartType === 'scatter' || state.chartType === 'line') {
+                aggregated = aggregated / values.length; // Average
+            }
+            dataValues.push(aggregated);
+        });
+        
+        // Chart colors
+        var colors = [
+            '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6',
+            '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
+            '#14b8a6', '#a855f7', '#eab308', '#10b981', '#f43f5e'
+        ];
+        
+        var chartConfig = {
+            type: state.chartType === 'scatter' ? 'scatter' : state.chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: state.yColumn,
+                    data: state.chartType === 'scatter' 
+                        ? labels.map(function(l, i) { return { x: i, y: dataValues[i] }; })
+                        : dataValues,
+                    backgroundColor: state.chartType === 'pie' 
+                        ? colors.slice(0, labels.length)
+                        : 'rgba(59, 130, 246, 0.7)',
+                    borderColor: state.chartType === 'pie'
+                        ? colors.slice(0, labels.length)
+                        : '#3b82f6',
+                    borderWidth: state.chartType === 'pie' ? 2 : 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: state.chartType === 'pie',
+                        position: 'bottom',
+                        labels: { color: '#e5e7eb' }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#1f2937',
+                        titleColor: '#e5e7eb',
+                        bodyColor: '#e5e7eb',
+                        borderColor: '#374151',
+                        borderWidth: 1
+                    }
+                },
+                scales: state.chartType === 'pie' ? {} : {
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' }
+                    },
+                    y: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+        
+        dataCharts[stateKey] = new Chart(canvas, chartConfig);
+    }
+    
+    function renderChart(stateKey, headers, rows, columnTypes, state) {
+        var canvas = document.getElementById('chart-' + stateKey);
+        if (!canvas) return;
+        
+        // Destroy existing chart
+        if (dataCharts[stateKey]) {
+            dataCharts[stateKey].destroy();
+        }
+        
+        if (!state.xColumn || !state.yColumn) {
+            return;
+        }
+        
+        // ✅ Use paginated rows (same as table)
+        var startRow = state.page * DATA_CONFIG.maxTableRows;
+        var endRow = Math.min(startRow + DATA_CONFIG.maxTableRows, rows.length);
+        var chartRows = rows.slice(startRow, endRow);
+
+        // ✅ Show warning if data is paginated
+        var warningEl = document.getElementById('chart-warning-' + stateKey);
+        if (warningEl) {
+            if (rows.length > DATA_CONFIG.maxTableRows) {
+                warningEl.style.display = 'block';
+                warningEl.textContent = 'Showing rows ' + (startRow + 1) + '-' + endRow + ' of ' + rows.length + ' (use pagination to see more)';
+            } else {
+                warningEl.style.display = 'none';
+            }
+        }
+
+        var labels = [];
+        var dataValues = [];
+        
+        // Group by X column if needed
+        var grouped = {};
+        chartRows.forEach(function(row) {
+            var x = String(row[state.xColumn] || 'Unknown');
+            var y = parseNumericValue(row[state.yColumn]);
+            if (y === null) return;
+            
+            if (!grouped[x]) {
+                grouped[x] = [];
+            }
+            grouped[x].push(y);
+        });
+        
+        // Aggregate (sum for bar, average for scatter/line)
+        var entries = Object.keys(grouped);
+        
+        // Limit categories
+        if (entries.length > DATA_CONFIG.maxCategories && state.chartType !== 'scatter') {
+            // Sort by total value and take top N
+            entries.sort(function(a, b) {
+                var sumA = grouped[a].reduce(function(s, v) { return s + v; }, 0);
+                var sumB = grouped[b].reduce(function(s, v) { return s + v; }, 0);
+                return sumB - sumA;
+            });
+            
+            var topEntries = entries.slice(0, DATA_CONFIG.maxCategories - 1);
+            var otherSum = 0;
+            entries.slice(DATA_CONFIG.maxCategories - 1).forEach(function(key) {
+                otherSum += grouped[key].reduce(function(s, v) { return s + v; }, 0);
+            });
+            
+            entries = topEntries;
+            if (otherSum > 0) {
+                entries.push('Other');
+                grouped['Other'] = [otherSum];
+            }
+        }
+        
+        entries.forEach(function(key) {
+            labels.push(key);
+            var values = grouped[key];
+            var aggregated = values.reduce(function(s, v) { return s + v; }, 0);
+            if (state.chartType === 'scatter' || state.chartType === 'line') {
+                aggregated = aggregated / values.length; // Average
+            }
+            dataValues.push(aggregated);
+        });
+        
+        // Chart colors
+        var colors = [
+            '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6',
+            '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
+            '#14b8a6', '#a855f7', '#eab308', '#10b981', '#f43f5e'
+        ];
+        
+        var chartConfig = {
+            type: state.chartType === 'scatter' ? 'scatter' : state.chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: state.yColumn,
+                    data: state.chartType === 'scatter' 
+                        ? labels.map(function(l, i) { return { x: i, y: dataValues[i] }; })
+                        : dataValues,
+                    backgroundColor: state.chartType === 'pie' 
+                        ? colors.slice(0, labels.length)
+                        : 'rgba(59, 130, 246, 0.7)',
+                    borderColor: state.chartType === 'pie'
+                        ? colors.slice(0, labels.length)
+                        : '#3b82f6',
+                    borderWidth: state.chartType === 'pie' ? 2 : 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: state.chartType === 'pie',
+                        position: 'bottom',
+                        labels: { color: '#e5e7eb' }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#1f2937',
+                        titleColor: '#e5e7eb',
+                        bodyColor: '#e5e7eb',
+                        borderColor: '#374151',
+                        borderWidth: 1
+                    }
+                },
+                scales: state.chartType === 'pie' ? {} : {
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' }
+                    },
+                    y: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+        
+        dataCharts[stateKey] = new Chart(canvas, chartConfig);
+    }
+    
+    // Global functions for event handlers
+    window.setDataView = function(stateKey, view) {
+        dataStates[stateKey].view = view;
+        var nodeId = parseInt(stateKey.replace('data-', ''));
+        var node = nodes.find(function(n) { return n.id === nodeId; });
+        if (node) renderDataVisualization(node, 'data-viz-' + nodeId);
+    };
+    
+    window.setChartType = function(stateKey, chartType) {
+        dataStates[stateKey].chartType = chartType;
+        var nodeId = parseInt(stateKey.replace('data-', ''));
+        var node = nodes.find(function(n) { return n.id === nodeId; });
+        if (node) renderDataVisualization(node, 'data-viz-' + nodeId);
+    };
+    
+    window.setChartAxis = function(stateKey, axis, value) {
+        if (axis === 'x') dataStates[stateKey].xColumn = value;
+        else dataStates[stateKey].yColumn = value;
+        var nodeId = parseInt(stateKey.replace('data-', ''));
+        var node = nodes.find(function(n) { return n.id === nodeId; });
+        if (node) renderDataVisualization(node, 'data-viz-' + nodeId);
+    };
+    
+    window.sortDataTable = function(stateKey, column) {
+        var state = dataStates[stateKey];
+        if (state.sortColumn === column) {
+            state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            state.sortColumn = column;
+            state.sortDirection = 'asc';
+        }
+        state.page = 0;
+        var nodeId = parseInt(stateKey.replace('data-', ''));
+        var node = nodes.find(function(n) { return n.id === nodeId; });
+        if (node) renderDataVisualization(node, 'data-viz-' + nodeId);
+    };
+    
+    window.changeDataPage = function(stateKey, delta) {
+        dataStates[stateKey].page += delta;
+        var nodeId = parseInt(stateKey.replace('data-', ''));
+        var node = nodes.find(function(n) { return n.id === nodeId; });
+        if (node) renderDataVisualization(node, 'data-viz-' + nodeId);
+    };
+    // ========== END DATA VISUALIZATION ==========
+    function renderContent(node) {
+        // Check for data files (CSV, Excel) - MUST return early if found
+        if (node.embeddedFiles && node.embeddedFiles.length > 0) {
+            var dataFile = null;
+            for (var i = 0; i < node.embeddedFiles.length; i++) {
+                var file = node.embeddedFiles[i];
+                var ext = file.filename.split('.').pop().toLowerCase();
+                if (ext === 'csv' || ext === 'xlsx' || ext === 'xls') {
+                    dataFile = file;
+                    break;
+                }
+            }
+            
+            if (dataFile) {
+                var containerId = 'data-viz-' + node.id;
+                var capturedNode = node; // Capture for closure
+                setTimeout(function() {
+                    renderDataVisualization(capturedNode, containerId);
+                }, 50);
+                return '<div id="' + containerId + '"><div class="no-data-message">Loading data...</div></div>';
+            }
+        }
+        
+        if (node.embeddedImage) {
+            var imgHtml = '<img src="' + node.embeddedImage + '" alt="' + escapeHtml(node.imageFilename || "Image") + '">';
+            if (node.content && node.content.trim()) {
+                imgHtml += '<p style="margin-top: 1rem;">' + linkifyUrls(escapeHtml(node.content)) + '</p>';
+            }
+            return imgHtml;
+        }
+        
+        var nodeTypes = Array.isArray(node.node_type) ? node.node_type : [node.node_type];
+        if (nodeTypes.indexOf('list') >= 0) {
+            // Use synced version if sidebar is initialized
+            if (checklistSidebarItems && checklistSidebarItems.length > 0) {
+                return renderChecklistSynced(node);
+            }
+            return renderChecklist(node);
+        }
+        
+        if (node.embeddedFiles && node.embeddedFiles.length > 0) {
+            var filesHtml = "";
+            for (var i = 0; i < node.embeddedFiles.length; i++) {
+                filesHtml += renderFileCard(node.embeddedFiles[i]);
+            }
+            if (node.content && node.content.trim()) {
+                filesHtml += '<p style="margin-top: 1rem;">' + linkifyUrls(escapeHtml(node.content)) + '</p>';
+            }
+            return filesHtml;
+        }
+        
+        var content = node.content || "";
+        if (!content) return '<p style="color: var(--text-dim); font-style: italic;">No content</p>';
+        
+        if (isInteractiveCode(content)) {
+            return renderInteractiveCode(content, node.id);
+        }
+        
+        var ytMatch = content.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+        if (ytMatch) {
+            var remaining = content.replace(ytMatch[0], "").trim();
+            var videoId = ytMatch[1];
+            var originalUrl = 'https://www.youtube.com/watch?v=' + videoId;
+            var thumbnailUrl = 'https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg';
+            var html = '<div class="video-thumbnail" onclick="window.open(\'' + originalUrl + '\', \'_blank\')">' +
+                '<img src="' + thumbnailUrl + '" alt="YouTube Video" onerror="this.src=\'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg\'">' +
+                '<div class="video-play-btn">▶</div>' +
+                '<div class="video-platform">YouTube</div>' +
+                '</div>' +
+                '<p style="margin-top: 0.5rem; text-align: center;">' +
+                '<a href="' + originalUrl + '" target="_blank" rel="noopener" style="color: var(--accent); font-size: 0.875rem;">🔗 Open on YouTube</a>' +
+                '</p>';
+            if (remaining) html += '<p style="margin-top: 1rem;">' + linkifyUrls(escapeHtml(remaining)) + '</p>';
+            return html;
+        }
+
+        var vimeoMatch = content.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/);
+        if (vimeoMatch) {
+            var vimeoId = vimeoMatch[1];
+            var originalUrl = 'https://vimeo.com/' + vimeoId;
+            var html = '<div class="video-thumbnail" onclick="window.open(\'' + originalUrl + '\', \'_blank\')">' +
+                '<div class="video-placeholder"><span>🎬</span><p>Vimeo Video</p></div>' +
+                '<div class="video-play-btn">▶</div>' +
+                '<div class="video-platform">Vimeo</div>' +
+                '</div>' +
+                '<p style="margin-top: 0.5rem; text-align: center;">' +
+                '<a href="' + originalUrl + '" target="_blank" rel="noopener" style="color: var(--accent); font-size: 0.875rem;">🔗 Open on Vimeo</a>' +
+                '</p>';
+            return html;
+        }
+        
+        // Spotify
+        var spotifyMatch = content.match(/(?:https?:\/\/)?open\.spotify\.com\/(track|album|playlist|episode)\/([a-zA-Z0-9]+)/);
+        if (spotifyMatch) {
+            var spotifyType = spotifyMatch[1];
+            var spotifyId = spotifyMatch[2];
+            var originalUrl = 'https://open.spotify.com/' + spotifyType + '/' + spotifyId;
+            var html = '<div class="audio-card" onclick="window.open(\'' + originalUrl + '\', \'_blank\')">' +
+                '<div class="audio-icon">🎵</div>' +
+                '<div class="audio-info">' +
+                '<div class="audio-platform">Spotify ' + spotifyType.charAt(0).toUpperCase() + spotifyType.slice(1) + '</div>' +
+                '<div class="audio-action">Click to open in Spotify</div>' +
+                '</div>' +
+                '<div class="audio-play-btn">▶</div>' +
+                '</div>';
+            return html;
+        }
+
+        // SoundCloud
+        var soundcloudMatch = content.match(/(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)/);
+        if (soundcloudMatch) {
+            var originalUrl = soundcloudMatch[0];
+            if (!originalUrl.startsWith('http')) originalUrl = 'https://' + originalUrl;
+            var html = '<div class="audio-card" onclick="window.open(\'' + originalUrl + '\', \'_blank\')">' +
+                '<div class="audio-icon">🎧</div>' +
+                '<div class="audio-info">' +
+                '<div class="audio-platform">SoundCloud</div>' +
+                '<div class="audio-action">Click to open in SoundCloud</div>' +
+                '</div>' +
+                '<div class="audio-play-btn">▶</div>' +
+                '</div>';
+            return html;
+        }
+
+        // Generic audio URL (.mp3, .wav, .ogg, .m4a)
+        var audioMatch = content.match(/https?:\/\/[^\s]+\.(mp3|wav|ogg|m4a)(\?[^\s]*)?$/i);
+        if (audioMatch) {
+            var audioUrl = audioMatch[0];
+            var html = '<div class="audio-player-container">' +
+                '<div class="audio-icon-large">🎵</div>' +
+                '<audio controls style="width: 100%;">' +
+                '<source src="' + audioUrl + '" type="audio/' + audioMatch[1] + '">' +
+                'Your browser does not support audio.' +
+                '</audio>' +
+                '</div>';
+            return html;
+        }
+        var urlOnlyMatch = content.trim().match(/^(https?:\/\/[^\s]+)$/);
+        if (urlOnlyMatch) {
+            return '<a href="' + urlOnlyMatch[1] + '" target="_blank" rel="noopener" class="link-card">' +
+                   '<span class="link-icon">🔗</span>' +
+                   '<span class="link-url">' + escapeHtml(urlOnlyMatch[1]) + '</span>' +
+                   '</a>';
+        }
+        
+        return '<div style="line-height: 1.8;">' + linkifyMentions(linkifyUrls(parseMarkdown(content))) + '</div>';
+    }
+    function showSlide(orderIndex) {
+        if (orderIndex < 0 || orderIndex >= currentOrder.length) return;
+        
+        currentIndex = orderIndex;
+        var nodeIndex = currentOrder[orderIndex];
+        var node = nodes[nodeIndex];
+        
+        var visibleOrder = getVisibleOrder();
+        var visibleIndex = visibleOrder.indexOf(nodeIndex);
+        var displayNum = visibleIndex >= 0 ? visibleIndex + 1 : "–";
+        
+        els.currentSlide.textContent = displayNum;
+        els.progress.style.width = (((visibleIndex + 1) / visibleOrder.length) * 100) + "%";
+        els.cardTitle.textContent = node.title || "Untitled";
+        
+        // Check if this is an interactive slide
+        var content = node.content || "";
+        var isInteractive = isInteractiveCode(content);
+        var card = els.cardHeader.closest('.card');
+        
+        if (isInteractive) {
+            card.classList.add('interactive-mode');
+        } else {
+            card.classList.remove('interactive-mode');
+        }
+        
+        if (node.custom_color) {
+            els.cardHeader.style.background = node.custom_color;
+            card.style.setProperty('--header-color', node.custom_color);
+        } else {
+            els.cardHeader.style.background = "var(--bg-light)";
+            card.style.setProperty('--header-color', 'var(--bg-light)');
+        }
+        
+        var tags = Array.isArray(node.tags) ? node.tags : (node.tags ? String(node.tags).split(",") : []);
+        var metaHtml = "";
+        for (var i = 0; i < Math.min(tags.length, 3); i++) {
+            var tag = tags[i].trim();
+            if (tag) metaHtml += '<span class="tag">' + escapeHtml(tag) + '</span>';
+        }
+        els.cardMeta.innerHTML = metaHtml;
+        els.cardContent.innerHTML = renderContent(node);
+        
+        setupImageZoom();
+        
+        var currentVisibleIndex = visibleOrder.indexOf(nodeIndex);
+        els.prevBtn.disabled = currentVisibleIndex <= 0;
+        els.nextBtn.disabled = currentVisibleIndex >= visibleOrder.length - 1 || currentVisibleIndex === -1;
+        
+        var items = document.querySelectorAll(".sidebar-item");
+        for (var j = 0; j < items.length; j++) {
+            if (j === orderIndex) {
+                items[j].classList.add("active");
+            } else {
+                items[j].classList.remove("active");
+            }
+        }
+        // Update mark complete button
+        updateMarkCompleteButton(nodeIndex);
+    }
+    
+    var draggedItem = null;
+    var draggedIndex = null;
+    
+    function buildSidebar() {
+        var visibleOrder = getVisibleOrder();
+        var html = "";
+        var visibleNum = 0;
+        
+        for (var i = 0; i < currentOrder.length; i++) {
+            var nodeIndex = currentOrder[i];
+            var node = nodes[nodeIndex];
+            var isHidden = hiddenSlides[nodeIndex];
+            var activeClass = i === currentIndex ? " active" : "";
+            var hiddenClass = isHidden ? " hidden" : "";
+            
+            if (!isHidden) visibleNum++;
+            var displayNum = isHidden ? "–" : visibleNum;
+            
+            html += '<div class="sidebar-item' + activeClass + hiddenClass + '" data-order-index="' + i + '" data-node-index="' + nodeIndex + '" draggable="true">';
+            html += '<span class="drag-handle">⋮⋮</span>';
+            html += '<div class="sidebar-item-content">';
+            html += '<div class="sidebar-item-num">' + displayNum + '</div>';
+            html += '<div class="sidebar-item-title">' + escapeHtml(node.title || "Untitled") + '</div>';
+            html += '</div>';
+            html += '<button class="visibility-btn" data-node-index="' + nodeIndex + '" title="' + (isHidden ? "Show slide" : "Hide slide") + '">';
+            html += isHidden ? "👁️‍🗨️" : "👁️";
+            html += '</button>';
+            html += '</div>';
+        }
+        els.sidebarList.innerHTML = html;
+        
+        var items = els.sidebarList.querySelectorAll(".sidebar-item");
+        items.forEach(function(item) {
+            item.addEventListener("dragstart", handleDragStart);
+            item.addEventListener("dragend", handleDragEnd);
+            item.addEventListener("dragover", handleDragOver);
+            item.addEventListener("dragenter", handleDragEnter);
+            item.addEventListener("dragleave", handleDragLeave);
+            item.addEventListener("drop", handleDrop);
+            item.addEventListener("click", handleItemClick);
+        });
+        
+        var visButtons = els.sidebarList.querySelectorAll(".visibility-btn");
+        visButtons.forEach(function(btn) {
+            btn.addEventListener("click", handleVisibilityClick);
+        });
+        
+        updateCounts();
+    }
+    
+    function handleVisibilityClick(e) {
+        e.stopPropagation();
+        var nodeIndex = parseInt(this.getAttribute("data-node-index"));
+        
+        if (hiddenSlides[nodeIndex]) {
+            delete hiddenSlides[nodeIndex];
+        } else {
+            hiddenSlides[nodeIndex] = true;
+        }
+        
+        buildSidebar();
+        
+        var visibleOrder = getVisibleOrder();
+        if (visibleOrder.length === 0) {
+            els.cardContent.innerHTML = '<p style="color: var(--text-dim); font-style: italic;">All slides are hidden. Click "Show All" to restore.</p>';
+            els.currentSlide.textContent = "–";
+            els.progress.style.width = "0%";
+            return;
+        }
+        
+        var currentNodeIndex = currentOrder[currentIndex];
+        if (hiddenSlides[currentNodeIndex]) {
+            var newIndex = findNextVisibleIndex(currentIndex);
+            if (newIndex === -1) newIndex = findPrevVisibleIndex(currentIndex);
+            if (newIndex !== -1) {
+                showSlide(newIndex);
+            }
+        } else {
+            showSlide(currentIndex);
+        }
+    }
+    
+    function findNextVisibleIndex(fromIndex) {
+        for (var i = fromIndex + 1; i < currentOrder.length; i++) {
+            if (!hiddenSlides[currentOrder[i]]) return i;
+        }
+        return -1;
+    }
+    
+    function findPrevVisibleIndex(fromIndex) {
+        for (var i = fromIndex - 1; i >= 0; i--) {
+            if (!hiddenSlides[currentOrder[i]]) return i;
+        }
+        return -1;
+    }
+    
+    function showAllSlides() {
+        hiddenSlides = {};
+        buildSidebar();
+        showSlide(currentIndex);
+    }
+    function handleDragStart(e) {
+        draggedItem = this;
+        draggedIndex = parseInt(this.getAttribute("data-order-index"));
+        this.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", draggedIndex);
+    }
+    
+    function handleDragEnd(e) {
+        this.classList.remove("dragging");
+        var items = document.querySelectorAll(".sidebar-item");
+        items.forEach(function(item) {
+            item.classList.remove("drag-over");
+        });
+        draggedItem = null;
+        draggedIndex = null;
+    }
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    }
+    
+    function handleDragEnter(e) {
+        e.preventDefault();
+        if (this !== draggedItem) {
+            this.classList.add("drag-over");
+        }
+    }
+    
+    function handleDragLeave(e) {
+        this.classList.remove("drag-over");
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (this === draggedItem) return;
+        
+        var targetIndex = parseInt(this.getAttribute("data-order-index"));
+        
+        var draggedOrderValue = currentOrder[draggedIndex];
+        currentOrder.splice(draggedIndex, 1);
+        currentOrder.splice(targetIndex, 0, draggedOrderValue);
+        
+        buildSidebar();
+        
+        if (currentIndex === draggedIndex) {
+            currentIndex = targetIndex;
+        } else if (draggedIndex < currentIndex && targetIndex >= currentIndex) {
+            currentIndex--;
+        } else if (draggedIndex > currentIndex && targetIndex <= currentIndex) {
+            currentIndex++;
+        }
+        
+        showSlide(currentIndex);
+    }
+    
+    function handleItemClick(e) {
+        if (e.target.classList.contains("drag-handle")) return;
+        if (e.target.classList.contains("visibility-btn")) return;
+        var idx = parseInt(this.getAttribute("data-order-index"));
+        showSlide(idx);
+        closeSidebar();
+    }
+    
+    function resetOrder() {
+        currentOrder = originalOrder.slice();
+        hiddenSlides = {};
+        currentIndex = 0;
+        buildSidebar();
+        showSlide(0);
+    }
+    
+    function confirmRestart() {
+        var itemCount = checklistSidebarItems.filter(function(i) { return i.type === 'item' && i.checked; }).length;
+        var message = 'Are you sure you want to restart the presentation?\n\nThis will:\n• Reset all checklist progress';
+        if (itemCount > 0) {
+            message += ' (' + itemCount + ' completed items)';
+        }
+        message += '\n• Return to slide 1\n• Reset slide order\n\nThis cannot be undone.';
+        
+        if (confirm(message)) {
+            restartPresentation();
+        }
+    }
+    
+    function restartPresentation() {
+        // Reset checklist sidebar state
+        checklistSidebarItems.forEach(function(item) {
+            if (item.type === 'item') {
+                item.checked = false;
+            }
+        });
+        
+        // Clear localStorage for checklist
+        try {
+            localStorage.removeItem(checklistStorageKey);
+            
+            // Clear individual node checklist states
+            nodes.forEach(function(node) {
+                localStorage.removeItem('checklist-' + node.id);
+            });
+        } catch (e) {}
+        
+        // Reset slide order and hidden slides
+        currentOrder = originalOrder.slice();
+        hiddenSlides = {};
+        currentIndex = 0;
+        
+        // Reset completion tracking
+        hasShownCompletion = false;
+        startTime = Date.now();
+        
+        // Rebuild UI
+        buildSidebar();
+        renderChecklistSidebar();
+        updateChecklistSidebarProgress();
+        showSlide(0);
+        
+        // Close sidebar if open
+        closeSidebar();
+        
+        console.log('Presentation restarted');
+    }
+    
+    function nextSlide() {
+        var visibleOrder = getVisibleOrder();
+        var currentNodeIndex = currentOrder[currentIndex];
+        var currentVisibleIndex = visibleOrder.indexOf(currentNodeIndex);
+        
+        if (currentVisibleIndex < visibleOrder.length - 1) {
+            var nextNodeIndex = visibleOrder[currentVisibleIndex + 1];
+            var nextOrderIndex = currentOrder.indexOf(nextNodeIndex);
+            showSlide(nextOrderIndex);
+        }
+    }
+    
+    function prevSlide() {
+        var visibleOrder = getVisibleOrder();
+        var currentNodeIndex = currentOrder[currentIndex];
+        var currentVisibleIndex = visibleOrder.indexOf(currentNodeIndex);
+        
+        if (currentVisibleIndex > 0) {
+            var prevNodeIndex = visibleOrder[currentVisibleIndex - 1];
+            var prevOrderIndex = currentOrder.indexOf(prevNodeIndex);
+            showSlide(prevOrderIndex);
+        }
+    }
+    
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
+    
+    function toggleSidebar() {
+        els.sidebar.classList.toggle("open");
+        els.overlay.classList.toggle("open");
+    }
+    
+    function closeSidebar() {
+        els.sidebar.classList.remove("open");
+        els.overlay.classList.remove("open");
+    }
+    
+    // Event listeners
+    els.prevBtn.onclick = prevSlide;
+    els.nextBtn.onclick = nextSlide;
+    els.themeToggle.onclick = toggleTheme;
+    els.resetOrderBtn.onclick = resetOrder;
+    els.showAllBtn.onclick = showAllSlides;
+    document.getElementById("fullscreenBtn").onclick = toggleFullscreen;
+    document.getElementById("sidebarToggle").onclick = toggleSidebar;
+    els.overlay.onclick = closeSidebar;
+    
+    // Restart button
+    if (els.restartBtn) {
+        els.restartBtn.onclick = confirmRestart;
+    }
+    
+    // Mark complete button
+    if (els.markCompleteBtn) {
+        els.markCompleteBtn.onclick = handleMarkComplete;
+    }
+    
+    // Completion modal listeners
+    if (els.closeCompletionBtn) {
+        els.closeCompletionBtn.onclick = hideCompletionModal;
+    }
+    if (els.completionOverlay) {
+        els.completionOverlay.onclick = hideCompletionModal;
+    }
+    if (els.generateReportBtn) {
+        els.generateReportBtn.onclick = generateCompletionReport;
+    }
+    if (els.exportProgressBtn) {
+        els.exportProgressBtn.onclick = exportProgress;
+    }
+    
+    // Sidebar report/import buttons
+    var sidebarReportBtn = document.getElementById('sidebarReportBtn');
+    if (sidebarReportBtn) {
+        sidebarReportBtn.onclick = generateCompletionReport;
+    }
+    
+    var importProgressInput = document.getElementById('importProgressInput');
+    if (importProgressInput) {
+        importProgressInput.onchange = function(e) {
+            if (e.target.files && e.target.files[0]) {
+                importProgress(e.target.files[0]);
+                e.target.value = '';
+            }
+        };
+    }
+    
+    // Image zoom listeners
+    els.imageZoomOverlay.onclick = closeImageZoom;
+    els.imageZoomClose.onclick = function(e) {
+        e.stopPropagation();
+        closeImageZoom();
+    };
+    
+    // Touch/swipe listeners
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
+    document.addEventListener("touchend", handleTouchEnd, { passive: true });
+    
+    // Keyboard listeners
+    document.onkeydown = function(e) {
+        if (e.key === "Escape") {
+            if (els.imageZoomOverlay.classList.contains("open")) {
+                closeImageZoom();
+                return;
+            }
+            closeSidebar();
+            return;
+        }
+        
+        if (els.imageZoomOverlay.classList.contains("open")) return;
+        
+        if (e.key === "ArrowRight" || e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            prevSlide();
+        }
+    };
+    
+    // Checklist interaction handler - works for both standalone and synced checklists
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'checkbox' && e.target.closest('.checklist-wrapper')) {
+            var wrapper = e.target.closest('.checklist-wrapper');
+            var nodeId = wrapper.getAttribute('data-node-id');
+            var idx = parseInt(e.target.getAttribute('data-idx'));
+            var isChecked = e.target.checked;
+            var isSynced = wrapper.classList.contains('synced');
+            
+            var label = e.target.closest('.checklist-item');
+            if (isChecked) {
+                label.classList.add('checked');
+            } else {
+                label.classList.remove('checked');
+            }
+            
+            // If synced with sidebar, update sidebar state
+            if (isSynced && checklistSidebarItems && checklistSidebarItems.length > 0) {
+                var sidebarIdx = parseInt(label.getAttribute('data-sidebar-idx'));
+                
+                if (sidebarIdx >= 0 && checklistSidebarItems[sidebarIdx]) {
+                    checklistSidebarItems[sidebarIdx].checked = isChecked;
+                    
+                    // Update sidebar visual
+                    var sidebarEl = document.querySelector('.sidebar-checklist-item[data-idx="' + sidebarIdx + '"]');
+                    if (sidebarEl) {
+                        if (isChecked) {
+                            sidebarEl.classList.add('checked');
+                            sidebarEl.querySelector('.checkmark').textContent = '✓';
+                        } else {
+                            sidebarEl.classList.remove('checked');
+                            sidebarEl.querySelector('.checkmark').textContent = '';
+                        }
+                    }
+                    
+                    // Save to localStorage
+                    saveChecklistSidebarState();
+                    
+                    // Update progress bar in sidebar
+                    updateChecklistSidebarProgress();
+                    
+                    // Check for completion
+                    checkForCompletion();
+                }
+            } else {
+                // Standalone checklist - save to node-specific storage
+                var storageKey = 'checklist-' + nodeId;
+                var savedState = {};
+                try {
+                    var saved = localStorage.getItem(storageKey);
+                    if (saved) savedState = JSON.parse(saved);
+                } catch (err) {}
+                
+                savedState[idx] = isChecked;
+                localStorage.setItem(storageKey, JSON.stringify(savedState));
+            }
+            
+            // Update progress bar in the slide
+            var items = wrapper.querySelectorAll('.checklist-item');
+            var total = items.length;
+            var checked = wrapper.querySelectorAll('.checklist-item.checked').length;
+            var percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+            
+            var progressFill = wrapper.querySelector('.checklist-progress-fill');
+            var progressText = wrapper.querySelector('.checklist-progress-text');
+            
+            if (progressFill) progressFill.style.width = percentage + '%';
+            if (progressText) progressText.textContent = percentage + '% (' + checked + '/' + total + ')';
+        }
+    });
+    
+    // ========== CHECKLIST SIDEBAR (TABBED) ==========
+    var checklistSidebarItems = [];
+    var checklistStorageKey = 'presentation-checklist-' + document.title;
+    
+    function initChecklistSidebar() {
+        var listNodes = nodes.filter(function(n) {
+            var types = Array.isArray(n.node_type) ? n.node_type : [n.node_type];
+            return types.indexOf('list') >= 0;
+        });
+        
+        // Hide checklist tab and progress if no list nodes
+        if (listNodes.length === 0) {
+            var checklistTab = document.getElementById('checklistTab');
+            var progressHeader = document.getElementById('sidebarProgressHeader');
+            if (checklistTab) checklistTab.classList.add('hidden');
+            if (progressHeader) progressHeader.classList.add('hidden');
+            return;
+        }
+        
+        listNodes.sort(function(a, b) { return a.id - b.id; });
+        checklistSidebarItems = parseAllListNodes(listNodes);
+        loadChecklistSidebarState();
+        renderChecklistSidebar();
+        updateChecklistSidebarProgress();
+        setupSidebarTabs();
+    }
+    
+    function setupSidebarTabs() {
+        var tabs = document.querySelectorAll('.sidebar-tab');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                var tabName = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(function(t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                
+                // Show correct content
+                document.getElementById('slidesTabContent').classList.toggle('hidden', tabName !== 'slides');
+                document.getElementById('checklistTabContent').classList.toggle('hidden', tabName !== 'checklist');
+            });
+        });
+    }
+    
+    function parseAllListNodes(listNodes) {
+        var allItems = [];
+        
+        listNodes.forEach(function(listNode, listIndex) {
+            var items = parseChecklistWithLinks(listNode.content, listNode.id);
+            
+            if (items.length > 0) {
+                allItems.push({
+                    type: 'section',
+                    title: listNode.title || 'Checklist ' + (listIndex + 1),
+                    nodeId: listNode.id
+                });
+                
+                items.forEach(function(item) {
+                    allItems.push(item);
+                });
+            }
+        });
+        
+        return allItems;
+    }
+    
+    function parseChecklistWithLinks(content, listNodeId) {
+        if (!content) return [];
+        var items = [];
+        var lines = content.split('\n');
+        
+        lines.forEach(function(line, lineIndex) {
+            var match = line.match(/^(\s*)-\s*\[([ xX])\]\s*(.+)$/);
+            if (!match) return;
+            
+            var text = match[3].trim();
+            var checked = match[2].toLowerCase() === 'x';
+            
+            var dueMatch = text.match(/@due:(\d{4}-\d{2}-\d{2})/);
+            var dueDate = dueMatch ? dueMatch[1] : null;
+            if (dueDate) text = text.replace(/@due:\d{4}-\d{2}-\d{2}/, '').trim();
+            
+            var slideMatch = text.match(/#(\d+)\s*$/);
+            var slideNum = slideMatch ? parseInt(slideMatch[1]) : null;
+            if (slideNum) text = text.replace(/#\d+\s*$/, '').trim();
+            
+            var nodeMatch = text.match(/@Node #(\d+)/);
+            var linkedNodeId = nodeMatch ? parseInt(nodeMatch[1]) : null;
+            
+            var linkTarget = null;
+            if (linkedNodeId) {
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i].id === linkedNodeId) {
+                        linkTarget = { type: 'node', nodeId: linkedNodeId };
+                        break;
+                    }
+                }
+            } else if (slideNum && slideNum > 0 && slideNum <= nodes.length) {
+                var targetNode = nodes[slideNum - 1];
+                linkTarget = { 
+                    type: 'slide', 
+                    slideNum: slideNum,
+                    nodeId: targetNode ? targetNode.id : null
+                };
+            }
+            
+            items.push({
+                type: 'item',
+                text: text,
+                checked: checked,
+                dueDate: dueDate,
+                linkTarget: linkTarget,
+                listNodeId: listNodeId,
+                lineIndex: lineIndex
+            });
+        });
+        
+        return items;
+    }
+    
+    function renderChecklistSidebar() {
+        var container = document.getElementById('checklistSidebarContent');
+        if (!container) return;
+        
+        var html = '';
+        
+        checklistSidebarItems.forEach(function(item, idx) {
+            if (item.type === 'section') {
+                html += '<div class="checklist-section-label">From: ' + escapeHtml(item.title) + '</div>';
+            } else {
+                var checkedClass = item.checked ? ' checked' : '';
+                var checkmark = item.checked ? '✓' : '';
+                
+                var linkHtml = '';
+                if (item.linkTarget) {
+                    var linkText = item.linkTarget.type === 'slide' 
+                        ? '→#' + item.linkTarget.slideNum 
+                        : '→Node';
+                    linkHtml = '<span class="sidebar-item-link" data-link-idx="' + idx + '">' + linkText + '</span>';
+                }
+                
+                var dueHtml = '';
+                if (item.dueDate) {
+                    var due = formatDueDate(item.dueDate);
+                    dueHtml = '<span class="checklist-due ' + due.className + '">' + due.text + '</span>';
+                }
+                
+                var hasLink = item.linkTarget ? 'true' : 'false';
+                html += '<div class="sidebar-checklist-item' + checkedClass + '" data-idx="' + idx + '" data-has-link="' + hasLink + '">';
+                html += '<span class="checkmark">' + checkmark + '</span>';
+                html += '<span class="sidebar-item-text" title="' + escapeHtml(item.text) + '">' + escapeHtml(item.text) + '</span>';
+                html += dueHtml;
+                html += linkHtml;
+                html += '</div>';
+            }
+        });
+        
+        container.innerHTML = html;
+        attachChecklistSidebarListeners();
+    }
+    
+    function attachChecklistSidebarListeners() {
+        var container = document.getElementById('checklistSidebarContent');
+        if (!container) return;
+        
+        container.querySelectorAll('.sidebar-checklist-item').forEach(function(el) {
+            var idx = parseInt(el.getAttribute('data-idx'));
+            var item = checklistSidebarItems[idx];
+            
+            if (!item || item.type === 'section') return;
+            
+            if (item.linkTarget) {
+                // HAS link - read-only, click navigates to slide
+                el.style.cursor = 'pointer';
+                el.title = 'Click to go to slide and mark complete';
+                
+                el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('sidebar-item-link')) {
+                        navigateToLinkedSlide(idx);
+                        return;
+                    }
+                    // Click anywhere navigates to the linked slide
+                    navigateToLinkedSlide(idx);
+                });
+            } else {
+                // NO link - can check directly in sidebar
+                el.style.cursor = 'pointer';
+                el.title = 'Click to mark complete';
+                
+                el.addEventListener('click', function(e) {
+                    toggleChecklistSidebarItem(idx);
+                });
+            }
+        });
+        // Check if all items completed
+        checkForCompletion();
+    }
+    
+    function toggleChecklistSidebarItem(idx) {
+        var item = checklistSidebarItems[idx];
+        if (!item || item.type === 'section') return;
+        
+        item.checked = !item.checked;
+        
+        var el = document.querySelector('.sidebar-checklist-item[data-idx="' + idx + '"]');
+        if (el) {
+            if (item.checked) {
+                el.classList.add('checked');
+                el.querySelector('.checkmark').textContent = '✓';
+            } else {
+                el.classList.remove('checked');
+                el.querySelector('.checkmark').textContent = '';
+            }
+        }
+        
+        saveChecklistSidebarState();
+        updateChecklistSidebarProgress();
+    }
+    
+    function navigateToLinkedSlide(idx) {
+        var item = checklistSidebarItems[idx];
+        if (!item || !item.linkTarget) return;
+        
+        var targetNodeId = item.linkTarget.nodeId;
+        if (!targetNodeId) return;
+        
+        for (var i = 0; i < currentOrder.length; i++) {
+            var nodeIndex = currentOrder[i];
+            if (nodes[nodeIndex].id === targetNodeId) {
+                if (hiddenSlides[nodeIndex]) {
+                    delete hiddenSlides[nodeIndex];
+                    buildSidebar();
+                }
+                showSlide(i);
+                closeSidebar();
+                return;
+            }
+        }
+    }
+    function updateMarkCompleteButton(nodeIndex) {
+        if (!els.markCompleteBtn) return;
+        
+        // Check if checklist sidebar is initialized
+        if (!checklistSidebarItems || checklistSidebarItems.length === 0) {
+            els.markCompleteBtn.classList.add('hidden');
+            return;
+        }
+        
+        var node = nodes[nodeIndex];
+        if (!node) {
+            els.markCompleteBtn.classList.add('hidden');
+            return;
+        }
+        
+        // Find checklist item linked to this slide/node
+        var linkedItemIdx = findLinkedChecklistItem(node.id, nodeIndex);
+        
+        if (linkedItemIdx === -1) {
+            els.markCompleteBtn.classList.add('hidden');
+            return;
+        }
+        
+        var item = checklistSidebarItems[linkedItemIdx];
+        els.markCompleteBtn.classList.remove('hidden');
+        els.markCompleteBtn.dataset.itemIdx = linkedItemIdx;
+        
+        if (item.checked) {
+            els.markCompleteBtn.innerHTML = '✓ Completed';
+            els.markCompleteBtn.classList.add('completed');
+        } else {
+            els.markCompleteBtn.innerHTML = '☐ Mark Complete';
+            els.markCompleteBtn.classList.remove('completed');
+        }
+    }
+    
+    function findLinkedChecklistItem(nodeId, nodeIndex) {
+        for (var i = 0; i < checklistSidebarItems.length; i++) {
+            var item = checklistSidebarItems[i];
+            if (item.type !== 'item' || !item.linkTarget) continue;
+            
+            // Check if linked by node ID (@Node #ID)
+            if (item.linkTarget.nodeId === nodeId) {
+                return i;
+            }
+            
+            // Check if linked by slide number (#N)
+            if (item.linkTarget.type === 'slide') {
+                var slideNum = item.linkTarget.slideNum;
+                // slideNum is 1-indexed, nodeIndex is 0-indexed
+                if (slideNum - 1 === nodeIndex) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    function handleMarkComplete() {
+        var idx = parseInt(els.markCompleteBtn.dataset.itemIdx);
+        if (isNaN(idx)) return;
+        
+        var item = checklistSidebarItems[idx];
+        if (!item || item.type === 'section') return;
+        
+        // Toggle state
+        item.checked = !item.checked;
+        
+        // Update sidebar visual
+        var el = document.querySelector('.sidebar-checklist-item[data-idx="' + idx + '"]');
+        if (el) {
+            if (item.checked) {
+                el.classList.add('checked');
+                el.querySelector('.checkmark').textContent = '✓';
+            } else {
+                el.classList.remove('checked');
+                el.querySelector('.checkmark').textContent = '';
+            }
+            // Check if all items completed
+            checkForCompletion();
+        }
+        
+        // Save state
+        saveChecklistSidebarState();
+        
+        // Update progress
+        updateChecklistSidebarProgress();
+        
+        // Update button state
+        if (item.checked) {
+            els.markCompleteBtn.innerHTML = '✓ Completed';
+            els.markCompleteBtn.classList.add('completed');
+        } else {
+            els.markCompleteBtn.innerHTML = '☐ Mark Complete';
+            els.markCompleteBtn.classList.remove('completed');
+        }
+        
+        // Refresh the current slide if it's a list node (to sync the in-slide checklist)
+        var currentNodeIndex = currentOrder[currentIndex];
+        var currentNode = nodes[currentNodeIndex];
+        var currentTypes = Array.isArray(currentNode.node_type) ? currentNode.node_type : [currentNode.node_type];
+        if (currentTypes.indexOf('list') >= 0) {
+            els.cardContent.innerHTML = renderChecklistSynced(currentNode);
+        }
+        
+        // Open sidebar only when marking complete (not when unmarking)
+        if (item.checked) {
+            els.sidebar.classList.add('open');
+            els.overlay.classList.add('open');
+            
+            // Switch to checklist tab
+            var tabs = document.querySelectorAll('.sidebar-tab');
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            var checklistTab = document.getElementById('checklistTab');
+            if (checklistTab) checklistTab.classList.add('active');
+            
+            document.getElementById('slidesTabContent').classList.add('hidden');
+            document.getElementById('checklistTabContent').classList.remove('hidden');
+        }
+    }
+    // ========== COMPLETION SYSTEM ==========
+    function checkForCompletion() {
+        if (hasShownCompletion) return;
+        
+        var items = checklistSidebarItems.filter(function(i) { return i.type === 'item'; });
+        var total = items.length;
+        var checked = items.filter(function(i) { return i.checked; }).length;
+        
+        if (total > 0 && checked === total) {
+            hasShownCompletion = true;
+            showCompletionModal();
+        }
+    }
+    
+    function showCompletionModal() {
+        var items = checklistSidebarItems.filter(function(i) { return i.type === 'item'; });
+        var total = items.length;
+        
+        // Update stats
+        els.completedCount.textContent = total + '/' + total;
+        els.timeSpent.textContent = formatTimeSpent();
+        
+        // Show modal
+        els.completionOverlay.classList.remove('hidden');
+        els.completionModal.classList.remove('hidden');
+        
+        setTimeout(function() {
+            els.completionOverlay.classList.add('visible');
+            els.completionModal.classList.add('visible');
+        }, 10);
+        
+        // Trigger confetti
+        createConfetti();
+    }
+    
+    function hideCompletionModal() {
+        els.completionOverlay.classList.remove('visible');
+        els.completionModal.classList.remove('visible');
+        
+        setTimeout(function() {
+            els.completionOverlay.classList.add('hidden');
+            els.completionModal.classList.add('hidden');
+        }, 300);
+    }
+    
+    function formatTimeSpent() {
+        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+        var hours = Math.floor(elapsed / 3600);
+        var minutes = Math.floor((elapsed % 3600) / 60);
+        
+        if (hours > 0) {
+            return hours + 'h ' + minutes + 'm';
+        } else if (minutes > 0) {
+            return minutes + ' min';
+        } else {
+            return '< 1 min';
+        }
+    }
+    
+    function createConfetti() {
+        var colors = ['#22c55e', '#f59e0b', '#3b82f6', '#ef4444', '#a855f7', '#ec4899'];
+        var container = els.confettiContainer;
+        container.innerHTML = '';
+        
+        for (var i = 0; i < 50; i++) {
+            var piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = Math.random() * 100 + '%';
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDelay = Math.random() * 0.5 + 's';
+            piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+            
+            var size = 5 + Math.random() * 10;
+            piece.style.width = size + 'px';
+            piece.style.height = size + 'px';
+            piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            
+            container.appendChild(piece);
+        }
+        
+        // Clear confetti after animation
+        setTimeout(function() {
+            container.innerHTML = '';
+        }, 4000);
+    }
+    
+    function generateCompletionReport() {
+        var reviewerName = els.reviewerName.value.trim() || '______________________';
+        var items = checklistSidebarItems.filter(function(i) { return i.type === 'item'; });
+        var total = items.length;
+        var checked = items.filter(function(i) { return i.checked; }).length;
+        var presentationTitle = document.title || 'Presentation';
+        var completionDate = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        var itemsHtml = '';
+        checklistSidebarItems.forEach(function(item) {
+            if (item.type === 'section') {
+                itemsHtml += '<tr class="section-row"><td colspan="2"><strong>' + escapeHtml(item.title) + '</strong></td></tr>';
+            } else {
+                var status = item.checked ? '✓' : '☐';
+                var statusClass = item.checked ? 'checked' : 'unchecked';
+                itemsHtml += '<tr class="item-row ' + statusClass + '">';
+                itemsHtml += '<td class="status">' + status + '</td>';
+                itemsHtml += '<td>' + escapeHtml(item.text) + '</td>';
+                itemsHtml += '</tr>';
+            }
+        });
+        
+        var reportHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+        reportHtml += '<title>Completion Report - ' + escapeHtml(presentationTitle) + '</title>';
+        reportHtml += '<style>';
+        reportHtml += 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; color: #1f2328; }';
+        reportHtml += '.header { border-bottom: 3px solid #22c55e; padding-bottom: 1rem; margin-bottom: 2rem; }';
+        reportHtml += '.header h1 { margin: 0 0 0.5rem 0; color: #22c55e; font-size: 1.5rem; }';
+        reportHtml += '.header h2 { margin: 0; font-weight: normal; color: #656d76; font-size: 1rem; }';
+        reportHtml += '.meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: #f6f8fa; border-radius: 8px; }';
+        reportHtml += '.meta-item label { display: block; font-size: 0.75rem; color: #656d76; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }';
+        reportHtml += '.meta-item span { font-size: 1rem; font-weight: 600; }';
+        reportHtml += '.summary { text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border-radius: 8px; margin-bottom: 2rem; }';
+        reportHtml += '.summary .percent { font-size: 3rem; font-weight: 700; }';
+        reportHtml += '.summary .label { font-size: 0.875rem; opacity: 0.9; }';
+        reportHtml += 'table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }';
+        reportHtml += '.section-row td { padding: 1rem 0.5rem 0.5rem 0.5rem; border-bottom: 1px solid #d0d7de; color: #656d76; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }';
+        reportHtml += '.item-row td { padding: 0.75rem 0.5rem; border-bottom: 1px solid #f0f0f0; }';
+        reportHtml += '.item-row .status { width: 30px; font-size: 1.25rem; }';
+        reportHtml += '.item-row.checked .status { color: #22c55e; }';
+        reportHtml += '.item-row.unchecked .status { color: #d0d7de; }';
+        reportHtml += '.item-row.unchecked td { color: #656d76; }';
+        reportHtml += '.signature { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #d0d7de; }';
+        reportHtml += '.signature-line { display: flex; gap: 2rem; margin-bottom: 1rem; }';
+        reportHtml += '.signature-field { flex: 1; }';
+        reportHtml += '.signature-field label { display: block; font-size: 0.75rem; color: #656d76; margin-bottom: 0.5rem; }';
+        reportHtml += '.signature-field .line { border-bottom: 1px solid #1f2328; min-height: 2rem; }';
+        reportHtml += '.footer { margin-top: 3rem; text-align: center; font-size: 0.75rem; color: #656d76; }';
+        reportHtml += '@media print { body { padding: 0; } .summary { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }';
+        reportHtml += '</style></head><body>';
+        
+        reportHtml += '<div class="header">';
+        reportHtml += '<h1>📋 Review Completion Report</h1>';
+        reportHtml += '<h2>' + escapeHtml(presentationTitle) + '</h2>';
+        reportHtml += '</div>';
+        
+        reportHtml += '<div class="meta">';
+        reportHtml += '<div class="meta-item"><label>Reviewer</label><span>' + escapeHtml(reviewerName) + '</span></div>';
+        reportHtml += '<div class="meta-item"><label>Completion Date</label><span>' + completionDate + '</span></div>';
+        reportHtml += '<div class="meta-item"><label>Time Spent</label><span>' + formatTimeSpent() + '</span></div>';
+        reportHtml += '<div class="meta-item"><label>Items Reviewed</label><span>' + checked + ' of ' + total + '</span></div>';
+        reportHtml += '</div>';
+        
+        var percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+        reportHtml += '<div class="summary">';
+        reportHtml += '<div class="percent">' + percentage + '%</div>';
+        reportHtml += '<div class="label">Complete</div>';
+        reportHtml += '</div>';
+        
+        reportHtml += '<table>' + itemsHtml + '</table>';
+        
+        reportHtml += '<div class="signature">';
+        reportHtml += '<div class="signature-line">';
+        reportHtml += '<div class="signature-field"><label>Signature</label><div class="line"></div></div>';
+        reportHtml += '<div class="signature-field"><label>Date</label><div class="line"></div></div>';
+        reportHtml += '</div>';
+        reportHtml += '</div>';
+        
+        reportHtml += '<div class="footer">Generated by Branch Bot — Visual Knowledge Management</div>';
+        reportHtml += '</body></html>';
+        
+        // Open in new window for printing
+        var reportWindow = window.open('', '_blank');
+        reportWindow.document.write(reportHtml);
+        reportWindow.document.close();
+        reportWindow.focus();
+        
+        setTimeout(function() {
+            reportWindow.print();
+        }, 250);
+    }
+    
+    function exportProgress() {
+        var items = checklistSidebarItems.filter(function(i) { return i.type === 'item'; });
+        var progressData = {
+            version: 1,
+            presentation: document.title,
+            exportDate: new Date().toISOString(),
+            timeSpent: Date.now() - startTime,
+            reviewerName: els.reviewerName.value.trim(),
+            items: {}
+        };
+        
+        checklistSidebarItems.forEach(function(item, idx) {
+            if (item.type === 'item') {
+                progressData.items[idx] = item.checked;
+            }
+        });
+        
+        var dataStr = JSON.stringify(progressData, null, 2);
+        var blob = new Blob([dataStr], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'progress-' + document.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    function importProgress(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var data = JSON.parse(e.target.result);
+                
+                if (data.items) {
+                    checklistSidebarItems.forEach(function(item, idx) {
+                        if (item.type === 'item' && data.items[idx] !== undefined) {
+                            item.checked = data.items[idx];
+                        }
+                    });
+                    
+                    saveChecklistSidebarState();
+                    renderChecklistSidebar();
+                    updateChecklistSidebarProgress();
+                    
+                    if (data.reviewerName) {
+                        els.reviewerName.value = data.reviewerName;
+                    }
+                    
+                    if (data.timeSpent) {
+                        startTime = Date.now() - data.timeSpent;
+                    }
+                    
+                    // Refresh current slide
+                    showSlide(currentIndex);
+                    
+                    alert('Progress imported successfully!');
+                }
+            } catch (err) {
+                alert('Error importing progress: Invalid file format');
+            }
+        };
+        reader.readAsText(file);
+    }
+    // ========== END COMPLETION SYSTEM ==========
+    function updateChecklistSidebarProgress() {
+        var items = checklistSidebarItems.filter(function(i) { return i.type === 'item'; });
+        var total = items.length;
+        var checked = items.filter(function(i) { return i.checked; }).length;
+        var percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+        
+        var fill = document.getElementById('sidebarProgressFill');
+        var text = document.getElementById('sidebarProgressText');
+        
+        if (fill) fill.style.width = percentage + '%';
+        if (text) text.textContent = percentage + '% (' + checked + '/' + total + ')';
+    }
+    
+    function loadChecklistSidebarState() {
+        try {
+            var saved = localStorage.getItem(checklistStorageKey);
+            if (saved) {
+                var state = JSON.parse(saved);
+                checklistSidebarItems.forEach(function(item, idx) {
+                    if (item.type === 'item' && state[idx] !== undefined) {
+                        item.checked = state[idx];
+                    }
+                });
+            }
+        } catch (e) {}
+    }
+    
+    function saveChecklistSidebarState() {
+        try {
+            var state = {};
+            checklistSidebarItems.forEach(function(item, idx) {
+                if (item.type === 'item') {
+                    state[idx] = item.checked;
+                }
+            });
+            localStorage.setItem(checklistStorageKey, JSON.stringify(state));
+        } catch (e) {}
+    }
+    // ========== END CHECKLIST SIDEBAR ==========
+
+    // Initialize
+    buildSidebar();
+    if (nodes.length > 0) {
+        showSlide(0);
+    }
+    showInitialTouchHint();
+    initChecklistSidebar();
+})();
+</script>
+</body>
+</html>
