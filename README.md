@@ -303,6 +303,6 @@ Branch Bot is built on the shoulders of giants:
 
 **Built with ❤️ by a solo developer who believes your research should stay yours.**
 
-[Website](https://your-website.com) • [Download](#-installation) • [Pricing](#-pricing) • [Privacy](https://your-website.com/privacy.html)
+[Website]([https://your-website.com](https://massiaharts-commits.github.io/branchbot-updates/landing-page.html)) • [Download](#-installation) • [Pricing](#-pricing) • [Privacy](https://massiaharts-commits.github.io/branchbot-updates/landing-page.html#privacy)
 
 </div>
