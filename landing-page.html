@@ -753,6 +753,323 @@
                 font-size: 1.125rem;
             }
         }
+        
+        /* ========================================
+           WHY BRANCH BOT SECTION
+           ======================================== */
+        .why-bb {
+            position: relative;
+            padding: 140px 0;
+            background: var(--bg-surface);
+            overflow: hidden;
+        }
+        
+        .why-bb-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 30% 30%, rgba(232, 168, 73, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 70%, rgba(61, 139, 139, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .why-bb-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .why-bb-header h2 {
+            margin-bottom: 16px;
+        }
+        
+        .why-bb-header h2 span {
+            color: var(--accent-amber);
+        }
+        
+        .why-bb-header p {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Pillar cards - top row */
+        .why-bb-pillars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .why-bb-pillar {
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .why-bb-pillar.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .why-bb-pillar:nth-child(1) { transition-delay: 0.1s; }
+        .why-bb-pillar:nth-child(2) { transition-delay: 0.2s; }
+        .why-bb-pillar:nth-child(3) { transition-delay: 0.3s; }
+        
+        .why-bb-pillar:hover {
+            border-color: var(--border-light);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .why-bb-pillar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-amber), var(--accent-teal));
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+        }
+        
+        .why-bb-pillar:hover::before {
+            opacity: 1;
+        }
+        
+        .why-bb-pillar-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: rgba(232, 168, 73, 0.1);
+            border-radius: 16px;
+        }
+        
+        .why-bb-pillar h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .why-bb-pillar p {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        .why-bb-pillar p strong {
+            color: var(--accent-amber);
+        }
+        
+        /* Comparison table */
+        .why-bb-compare {
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease 0.2s;
+        }
+        
+        .why-bb-compare.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .why-bb-compare-header {
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr;
+            gap: 0;
+            padding: 18px 28px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .why-bb-compare-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+        }
+        
+        .why-bb-compare-label.why-bb-compare-bb {
+            color: var(--accent-amber);
+        }
+        
+        .why-bb-compare-row {
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr;
+            gap: 0;
+            padding: 16px 28px;
+            border-bottom: 1px solid var(--border);
+            transition: background var(--transition-fast);
+        }
+        
+        .why-bb-compare-row:last-child {
+            border-bottom: none;
+        }
+        
+        .why-bb-compare-row:hover {
+            background: var(--bg-surface);
+        }
+        
+        .why-bb-compare-tool {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .why-bb-compare-tool span {
+            font-size: 1.125rem;
+        }
+        
+        .why-bb-compare-them {
+            font-size: 0.9375rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+        }
+        
+        .why-bb-compare-us {
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+            border-left: 2px solid rgba(232, 168, 73, 0.3);
+        }
+        
+        /* Stats row */
+        .why-bb-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease 0.3s;
+        }
+        
+        .why-bb-stats.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .why-bb-stat {
+            text-align: center;
+        }
+        
+        .why-bb-stat-value {
+            font-family: var(--font-headline);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: var(--accent-amber);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        
+        .why-bb-stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        
+        .why-bb-stat-divider {
+            width: 1px;
+            height: 60px;
+            background: var(--border-light);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .why-bb-compare-header,
+            .why-bb-compare-row {
+                grid-template-columns: 160px 1fr 1fr;
+                padding: 14px 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .why-bb {
+                padding: 100px 0;
+            }
+            
+            .why-bb-pillars {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .why-bb-pillar {
+                padding: 28px 24px;
+            }
+            
+            .why-bb-compare-header {
+                display: none;
+            }
+            
+            .why-bb-compare-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 20px 24px;
+            }
+            
+            .why-bb-compare-us {
+                border-left: 2px solid var(--accent-amber);
+                padding-left: 12px;
+                font-weight: 500;
+            }
+            
+            .why-bb-compare-them::before {
+                content: '❌ ';
+            }
+            
+            .why-bb-compare-us::before {
+                content: '✓ ';
+                color: var(--accent-amber);
+            }
+            
+            .why-bb-stats {
+                flex-direction: column;
+                gap: 32px;
+            }
+            
+            .why-bb-stat-divider {
+                width: 60px;
+                height: 1px;
+            }
+        }
+        
         /* ========================================
            SOLUTION SECTION
            ======================================== */
@@ -3244,6 +3561,7 @@
                 </a>
                 
                 <ul class="nav-links">
+                    <li><a href="#why">Why Branch Bot</a></li>
                     <li><a href="#features">Features</a></li>
                     <li><a href="#use-cases">Use Cases</a></li>
                     <li><a href="#privacy">Privacy</a></li>
@@ -3394,6 +3712,97 @@
         </div>
     </section>
 
+    <!-- ==========================================
+         WHY BRANCH BOT SECTION
+         ========================================== -->
+    <section class="why-bb" id="why">
+        <div class="why-bb-bg"></div>
+        
+        <div class="container">
+            <div class="why-bb-header">
+                <span class="section-label">Why Branch Bot</span>
+                <h2>Stop Paying More to <span>See Less</span></h2>
+                <p>Other tools make you work harder, pay more, and trust someone else with your data. Here's what you're missing.</p>
+            </div>
+            
+            <!-- Key differentiators - top row -->
+            <div class="why-bb-pillars">
+                <div class="why-bb-pillar" data-animate>
+                    <div class="why-bb-pillar-icon">💸</div>
+                    <h3>You're Wasting 82% on AI Tokens</h3>
+                    <p>ChatGPT and Claude web send your <em>entire</em> conversation every time. Branch Bot's @mention system lets you feed AI <strong>only what it needs</strong> — cutting token costs by 70-90%.</p>
+                </div>
+                <div class="why-bb-pillar" data-animate>
+                    <div class="why-bb-pillar-icon">🧠</div>
+                    <h3>Your Notes App Can't Think</h3>
+                    <p>Notion and Obsidian store information. Branch Bot lets you <strong>see how it connects and ask AI about it</strong> — in the same workspace. No other tool does both.</p>
+                </div>
+                <div class="why-bb-pillar" data-animate>
+                    <div class="why-bb-pillar-icon">🕵️</div>
+                    <h3>Your Data Isn't Yours Anymore</h3>
+                    <p>Every cloud tool stores your work on <em>their</em> servers. Branch Bot runs <strong>100% on your machine</strong>. No cloud. No accounts. Built for work that demands confidentiality.</p>
+                </div>
+            </div>
+            
+            <!-- Comparison table -->
+            <div class="why-bb-compare" data-animate>
+                <div class="why-bb-compare-header">
+                    <div class="why-bb-compare-label">If You Use</div>
+                    <div class="why-bb-compare-label">What You're Missing</div>
+                    <div class="why-bb-compare-label why-bb-compare-bb">What You Get With Branch Bot</div>
+                </div>
+                
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>📝</span> Notion / Obsidian</div>
+                    <div class="why-bb-compare-them">No visual connections, no AI analysis</div>
+                    <div class="why-bb-compare-us">Visual canvas + AI that reads your sources on command</div>
+                </div>
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>📚</span> Zotero / Mendeley</div>
+                    <div class="why-bb-compare-them">Stores references but can't analyze them</div>
+                    <div class="why-bb-compare-us">AI compares, synthesizes, and finds gaps across your sources</div>
+                </div>
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>🤖</span> ChatGPT / Claude Web</div>
+                    <div class="why-bb-compare-them">Forgets everything between conversations</div>
+                    <div class="why-bb-compare-us">@mention any node — AI sees exactly what you choose, every time</div>
+                </div>
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>🎨</span> Miro / FigJam</div>
+                    <div class="why-bb-compare-them">Whiteboards with no AI intelligence</div>
+                    <div class="why-bb-compare-us">Spatial thinking + AI analysis in one deep-work tool</div>
+                </div>
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>☁️</span> Google Drive / OneDrive</div>
+                    <div class="why-bb-compare-them">Your confidential files on someone else's servers</div>
+                    <div class="why-bb-compare-us">100% local storage — your data never leaves your machine</div>
+                </div>
+                <div class="why-bb-compare-row">
+                    <div class="why-bb-compare-tool"><span>📄</span> Word / Google Docs</div>
+                    <div class="why-bb-compare-them">Linear thinking forced into linear documents</div>
+                    <div class="why-bb-compare-us">Non-linear canvas where ideas branch and connect naturally</div>
+                </div>
+            </div>
+           
+            <!-- Bottom stat callouts -->
+            <div class="why-bb-stats" data-animate>
+                <div class="why-bb-stat">
+                    <div class="why-bb-stat-value">82%</div>
+                    <div class="why-bb-stat-label">Less Spent on AI Tokens</div>
+                </div>
+                <div class="why-bb-stat-divider"></div>
+                <div class="why-bb-stat">
+                    <div class="why-bb-stat-value">0</div>
+                    <div class="why-bb-stat-label">Bytes Sent to the Cloud</div>
+                </div>
+                <div class="why-bb-stat-divider"></div>
+                <div class="why-bb-stat">
+                    <div class="why-bb-stat-value">5→1</div>
+                    <div class="why-bb-stat-label">Tools Replaced</div>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- ==========================================
          SOLUTION SECTION
          ========================================== -->
@@ -4894,6 +5303,7 @@
     </script>
 </body>
 </html>
+
 
 
 
