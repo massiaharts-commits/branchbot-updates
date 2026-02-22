@@ -83,6 +83,7 @@
         .text-center { text-align: center; }
         .text-secondary { color: var(--text-secondary); }
         .text-amber { color: var(--accent-amber); }
+        .hidden { display: none !important; }
         
         /* ========================================
            TYPOGRAPHY
@@ -3548,6 +3549,394 @@
                 gap: 16px;
             }
         }
+        
+        /* ========================================
+           SHOWCASE / MEDIA SECTION
+           ======================================== */
+        .showcase {
+            position: relative;
+            padding: 100px 0 80px;
+            background: var(--bg-surface);
+        }
+        
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .showcase-header h2 { margin-bottom: 12px; }
+        .showcase-header h2 span { color: var(--accent-amber); }
+        
+        .showcase-media {
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
+        }
+        
+        .showcase-media.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Placeholder mockup */
+        .showcase-placeholder-window {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .showcase-placeholder-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .showcase-placeholder-bar .dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .dot.red { background: #ff5f57; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #28c840; }
+        
+        .showcase-placeholder-title {
+            flex: 1; text-align: center;
+            font-family: var(--font-mono); font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .showcase-placeholder-body {
+            display: grid;
+            grid-template-columns: 180px 1fr 240px;
+            height: 420px;
+        }
+        
+        .showcase-placeholder-sidebar {
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            padding: 16px 12px;
+        }
+        
+        .sp-item {
+            padding: 8px 12px; border-radius: 8px;
+            font-size: 0.8rem; color: var(--text-secondary);
+            margin-bottom: 4px; transition: all 0.15s;
+        }
+        .sp-item.active {
+            background: var(--bg-elevated); color: var(--text-primary);
+        }
+        
+        .showcase-placeholder-canvas {
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, rgba(232,168,73,0.03) 0%, transparent 70%);
+            overflow: hidden;
+        }
+        
+        .sp-node {
+            position: absolute;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: spFloat 4s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        .sp-node.n1 { animation-delay: 0s; }
+        .sp-node.n2 { animation-delay: 0.5s; border-left: 3px solid var(--accent-amber); }
+        .sp-node.n3 { animation-delay: 1s; }
+        .sp-node.n4 { animation-delay: 1.5s; border-left: 3px solid var(--accent-teal); }
+        .sp-node.n5 { animation-delay: 2s; border-left: 3px solid var(--accent-coral); }
+        
+        @keyframes spFloat {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        
+        .sp-lines {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .sp-lines line {
+            stroke: var(--text-dim); stroke-width: 0.4;
+            stroke-dasharray: 2,2; opacity: 0.4;
+        }
+        
+        .sp-badge {
+            position: absolute; bottom: 16px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(232,168,73,0.15);
+            border: 1px solid rgba(232,168,73,0.3);
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.78rem; color: var(--accent-amber);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+        }
+        
+        .showcase-placeholder-chat {
+            background: var(--bg-surface);
+            border-left: 1px solid var(--border);
+            padding: 0;
+            display: flex; flex-direction: column;
+        }
+        
+        .sp-chat-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem; font-weight: 600;
+        }
+        
+        .sp-msg {
+            margin: 8px 12px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.78rem; line-height: 1.4;
+        }
+        .sp-msg.user {
+            background: var(--accent-amber);
+            color: var(--bg-deep);
+            align-self: flex-end;
+            margin-left: 40px;
+            border-bottom-right-radius: 4px;
+        }
+        .sp-msg.ai {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            margin-right: 20px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .sp-chat-input {
+            margin-top: auto;
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+        
+        /* Video */
+        .showcase-video video {
+            width: 100%; display: block;
+            border-radius: 16px;
+        }
+        
+        /* Screenshots carousel */
+        .showcase-screenshots {
+            position: relative;
+        }
+        .showcase-screenshots-track {
+            display: flex; overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            gap: 0;
+        }
+        .showcase-screenshots-track::-webkit-scrollbar { display: none; }
+        .showcase-screenshots-track img {
+            width: 100%; flex-shrink: 0;
+            scroll-snap-align: center;
+            border-radius: 16px;
+        }
+        .showcase-screenshots-nav {
+            display: flex; align-items: center;
+            justify-content: center; gap: 16px;
+            padding: 16px 0;
+        }
+        .showcase-nav-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%; border: 1px solid var(--border);
+            background: var(--bg-surface); color: var(--text-primary);
+            cursor: pointer; font-size: 1rem;
+            transition: all 0.15s;
+        }
+        .showcase-nav-btn:hover {
+            border-color: var(--accent-amber);
+            background: var(--bg-elevated);
+        }
+        .showcase-nav-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            transition: all 0.2s;
+        }
+        
+        .showcase-nav-dot.active {
+            background: var(--accent-amber);
+            transform: scale(1.3);
+        }
+        
+        /* Showcase value props row */
+        .showcase-props {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 48px;
+            flex-wrap: wrap;
+        }
+        
+        .showcase-prop {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s ease;
+        }
+        
+        .showcase-prop.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .showcase-prop:nth-child(1) { transition-delay: 0.1s; }
+        .showcase-prop:nth-child(2) { transition-delay: 0.2s; }
+        .showcase-prop:nth-child(3) { transition-delay: 0.3s; }
+        .showcase-prop:nth-child(4) { transition-delay: 0.4s; }
+        
+        .showcase-prop-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .showcase { padding: 80px 0 60px; }
+            .showcase-placeholder-body {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .showcase-placeholder-sidebar,
+            .showcase-placeholder-chat { display: none; }
+            .showcase-placeholder-canvas { height: 300px; }
+            .showcase-props {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
+        }
+        
+        /* ========================================
+           HOW IT WORKS
+           ======================================== */
+        .how-it-works {
+            position: relative;
+            padding: 120px 0;
+            overflow: hidden;
+        }
+        
+        .hiw-steps {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .hiw-step {
+            flex: 1;
+            text-align: center;
+            padding: 32px 24px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .hiw-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hiw-step:nth-child(1) { transition-delay: 0.1s; }
+        .hiw-step:nth-child(3) { transition-delay: 0.2s; }
+        .hiw-step:nth-child(5) { transition-delay: 0.3s; }
+        
+        .hiw-step-num {
+            position: absolute;
+            top: 12px;
+            right: 24px;
+            font-family: var(--font-headline);
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            opacity: 0.1;
+            line-height: 1;
+        }
+        
+        .hiw-step-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.25rem;
+            background: rgba(232, 168, 73, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(232, 168, 73, 0.2);
+        }
+        
+        .hiw-step h3 {
+            font-size: 1.375rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .hiw-step p {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        .hiw-step p strong {
+            color: var(--accent-amber);
+        }
+        
+        .hiw-step-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            padding-top: 60px;
+            flex-shrink: 0;
+            width: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .how-it-works { padding: 80px 0; }
+            .hiw-steps {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .hiw-step-arrow {
+                padding-top: 0;
+                transform: rotate(90deg);
+                width: auto;
+            }
+            .hiw-step { padding: 24px 16px; }
+        }      
     </style>
 </head>
 <body>
@@ -3590,14 +3979,13 @@
         <div class="hero-content">
             <div class="hero-label">
                 <span class="hero-label-dot"></span>
-                <span>Visual Knowledge Management</span>
+                <span>Desktop App — Windows (Mac & Linux coming soon)</span>
             </div>
             
-            <h1>See the <span>Full Picture</span></h1>
+            <h1>Your Research.<br><span>Connected.</span> Private. AI-Powered.</h1>
             
             <p class="hero-subtitle">
-                A visual workspace for researchers, writers, journalists, and investigators. 
-                Connect ideas, follow threads, and discover insights — all 100% private on your machine.
+                A desktop app that puts everything on a visual canvas — PDFs, notes, images, files — then lets you connect ideas and chat with AI about exactly what you choose. 100% local. Your data never leaves your machine.
             </p>
             
             <div class="hero-cta">
@@ -3629,6 +4017,134 @@
         <div class="hero-scroll">
             <span>Scroll</span>
             <div class="hero-scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         SEE IT IN ACTION (Media Showcase)
+         ========================================== -->
+    <section class="showcase" id="showcase">
+        <div class="container">
+            <div class="showcase-header">
+                <span class="section-label">See It In Action</span>
+                <h2>What Branch Bot <span>Actually Looks Like</span></h2>
+                <p>A 60-second overview of how it works.</p>
+            </div>
+            
+            <!-- Media container — auto-switches between placeholder and real media -->
+            <div class="showcase-media" id="showcase-media" data-animate>
+                <!-- Placeholder (shown when no video/screenshot URLs configured) -->
+                <div class="showcase-placeholder" id="showcase-placeholder">
+                    <div class="showcase-placeholder-window">
+                        <div class="showcase-placeholder-bar">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                            <span class="showcase-placeholder-title">Branch Bot — Your Project</span>
+                        </div>
+                        <div class="showcase-placeholder-body">
+                            <div class="showcase-placeholder-sidebar">
+                                <div class="sp-item active">📁 My Research</div>
+                                <div class="sp-item">📁 Case Files</div>
+                                <div class="sp-item">📁 Notes</div>
+                            </div>
+                            <div class="showcase-placeholder-canvas">
+                                <div class="sp-node n1" style="top:15%;left:10%">📄 PDF Source</div>
+                                <div class="sp-node n2" style="top:10%;left:45%">💡 Key Insight</div>
+                                <div class="sp-node n3" style="top:40%;left:25%">🔗 Connection</div>
+                                <div class="sp-node n4" style="top:55%;left:55%">📎 Evidence</div>
+                                <div class="sp-node n5" style="top:25%;left:72%">👤 Subject</div>
+                                <svg class="sp-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <line x1="22" y1="20" x2="50" y2="15" />
+                                    <line x1="50" y1="15" x2="35" y2="45" />
+                                    <line x1="35" y1="45" x2="62" y2="60" />
+                                    <line x1="50" y1="15" x2="78" y2="30" />
+                                    <line x1="22" y1="20" x2="35" y2="45" />
+                                </svg>
+                                <div class="sp-badge">🎬 Video coming soon — download to try it yourself</div>
+                            </div>
+                            <div class="showcase-placeholder-chat">
+                                <div class="sp-chat-header">🤖 AI Chat</div>
+                                <div class="sp-msg user">Summarize @Node #12</div>
+                                <div class="sp-msg ai">Based on the PDF source, the key finding is...</div>
+                                <div class="sp-chat-input">Type @ to mention a node...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Real video (hidden by default, shown when URL configured) -->
+                <div class="showcase-video hidden" id="showcase-video">
+                    <video id="showcase-video-el" controls playsinline preload="metadata" poster="">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+                
+                <!-- Real screenshot carousel (hidden by default) -->
+                <div class="showcase-screenshots hidden" id="showcase-screenshots">
+                    <div class="showcase-screenshots-track" id="showcase-screenshots-track"></div>
+                    <div class="showcase-screenshots-nav">
+                        <button class="showcase-nav-btn" id="showcase-prev">←</button>
+                        <span class="showcase-nav-dots" id="showcase-dots"></span>
+                        <button class="showcase-nav-btn" id="showcase-next">→</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick value props under the showcase -->
+            <div class="showcase-props">
+                <div class="showcase-prop" data-animate>
+                    <span class="showcase-prop-icon">📥</span>
+                    <span>Drag in any file</span>
+                </div>
+                <div class="showcase-prop" data-animate>
+                    <span class="showcase-prop-icon">🔗</span>
+                    <span>Connect ideas visually</span>
+                </div>
+                <div class="showcase-prop" data-animate>
+                    <span class="showcase-prop-icon">@</span>
+                    <span>@mention for precision AI</span>
+                </div>
+                <div class="showcase-prop" data-animate>
+                    <span class="showcase-prop-icon">🔒</span>
+                    <span>100% on your machine</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ==========================================
+         HOW IT WORKS
+         ========================================== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">How It Works</span>
+                <h2>Three Steps. <span>That's It.</span></h2>
+            </div>
+            
+            <div class="hiw-steps">
+                <div class="hiw-step" data-animate>
+                    <div class="hiw-step-num">1</div>
+                    <div class="hiw-step-icon">📥</div>
+                    <h3>Collect</h3>
+                    <p>Drag in PDFs, images, code, spreadsheets — or capture from anywhere with <strong>Ctrl+Shift+B</strong>. Import academic references from Zotero or Mendeley. Everything becomes a node on your canvas.</p>
+                </div>
+                <div class="hiw-step-arrow">→</div>
+                <div class="hiw-step" data-animate>
+                    <div class="hiw-step-num">2</div>
+                    <div class="hiw-step-icon">🔗</div>
+                    <h3>Connect</h3>
+                    <p>Arrange nodes spatially. Draw connections between related ideas. Group them by theme. Collapse long threads. See your research as a <strong>living map</strong> instead of a list.</p>
+                </div>
+                <div class="hiw-step-arrow">→</div>
+                <div class="hiw-step" data-animate>
+                    <div class="hiw-step-num">3</div>
+                    <div class="hiw-step-icon">🤖</div>
+                    <h3>Converse</h3>
+                    <p>Type <strong>@</strong> to pull specific nodes into an AI conversation. AI sees only what you choose — saving 70-90% on tokens. Ask it to analyze, compare, summarize, or generate.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -3752,35 +4268,25 @@
                     <div class="why-bb-compare-label why-bb-compare-bb">What You Get With Branch Bot</div>
                 </div>
                 
-                <div class="why-bb-compare-row">
+               <div class="why-bb-compare-row">
                     <div class="why-bb-compare-tool"><span>📝</span> Notion / Obsidian</div>
                     <div class="why-bb-compare-them">No visual connections, no AI analysis</div>
                     <div class="why-bb-compare-us">Visual canvas + AI that reads your sources on command</div>
                 </div>
                 <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>📚</span> Zotero / Mendeley</div>
-                    <div class="why-bb-compare-them">Stores references but can't analyze them</div>
-                    <div class="why-bb-compare-us">AI compares, synthesizes, and finds gaps across your sources</div>
-                </div>
-                <div class="why-bb-compare-row">
                     <div class="why-bb-compare-tool"><span>🤖</span> ChatGPT / Claude Web</div>
-                    <div class="why-bb-compare-them">Forgets everything between conversations</div>
-                    <div class="why-bb-compare-us">@mention any node — AI sees exactly what you choose, every time</div>
+                    <div class="why-bb-compare-them">Forgets everything, sends entire context every time</div>
+                    <div class="why-bb-compare-us">@mention any node — AI sees exactly what you choose, always</div>
                 </div>
                 <div class="why-bb-compare-row">
                     <div class="why-bb-compare-tool"><span>🎨</span> Miro / FigJam</div>
-                    <div class="why-bb-compare-them">Whiteboards with no AI intelligence</div>
-                    <div class="why-bb-compare-us">Spatial thinking + AI analysis in one deep-work tool</div>
+                    <div class="why-bb-compare-them">Visual whiteboard but zero AI intelligence</div>
+                    <div class="why-bb-compare-us">Spatial thinking + AI analysis + file handling in one tool</div>
                 </div>
                 <div class="why-bb-compare-row">
                     <div class="why-bb-compare-tool"><span>☁️</span> Google Drive / OneDrive</div>
                     <div class="why-bb-compare-them">Your confidential files on someone else's servers</div>
-                    <div class="why-bb-compare-us">100% local storage — your data never leaves your machine</div>
-                </div>
-                <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>📄</span> Word / Google Docs</div>
-                    <div class="why-bb-compare-them">Linear thinking forced into linear documents</div>
-                    <div class="why-bb-compare-us">Non-linear canvas where ideas branch and connect naturally</div>
+                    <div class="why-bb-compare-us">100% local — your data never leaves your machine</div>
                 </div>
             </div>
            
@@ -3803,139 +4309,7 @@
             </div>
         </div>
     </section>
-    <!-- ==========================================
-         SOLUTION SECTION
-         ========================================== -->
-    <section class="solution" id="solution">
-        <!-- Background decoration -->
-        <div class="solution-bg"></div>
-        
-        <div class="container">
-            <!-- Header -->
-            <div class="solution-header">
-                <span class="section-label">The Solution</span>
-                <h2>Your <span>Visual Workspace</span></h2>
-                <p>See connections. Follow threads. Discover insights.</p>
-            </div>
-            
-            <!-- App showcase -->
-            <div class="solution-showcase">
-                <div class="solution-app" data-animate>
-                    <!-- Window title bar -->
-                    <div class="solution-app-bar">
-                        <div class="solution-app-dot red"></div>
-                        <div class="solution-app-dot yellow"></div>
-                        <div class="solution-app-dot green"></div>
-                        <span class="solution-app-title">Branch Bot — Investigation Alpha</span>
-                    </div>
-                    
-                    <!-- App content -->
-                    <div class="solution-app-content">
-                        <!-- Sidebar -->
-                        <div class="solution-app-sidebar">
-                            <div class="solution-app-sidebar-item active">
-                                <span>📁</span> Investigation Alpha
-                            </div>
-                            <div class="solution-app-sidebar-item">
-                                <span>📁</span> Research Notes
-                            </div>
-                            <div class="solution-app-sidebar-item">
-                                <span>📁</span> Source Archive
-                            </div>
-                            <div class="solution-app-sidebar-item">
-                                <span>📁</span> Draft Outline
-                            </div>
-                        </div>
-                        
-                        <!-- SVG connections -->
-                        <svg class="solution-app-connections" viewBox="0 0 600 500" preserveAspectRatio="none">
-                            <line x1="150" y1="100" x2="300" y2="180" />
-                            <line x1="300" y1="180" x2="450" y2="120" />
-                            <line x1="300" y1="180" x2="280" y2="320" />
-                            <line x1="150" y1="100" x2="120" y2="280" />
-                            <line x1="280" y1="320" x2="420" y2="350" />
-                        </svg>
-                        
-                        <!-- Canvas with nodes -->
-                        <div class="solution-app-canvas">
-                            <div class="sim-node amber" style="top: 60px; left: 80px;">
-                                <div class="sim-node-title">📄 Key Source</div>
-                                <div class="sim-node-meta">PDF • 12 connections</div>
-                            </div>
-                            
-                            <div class="sim-node teal" style="top: 140px; left: 250px;">
-                                <div class="sim-node-title">💡 Main Thread</div>
-                                <div class="sim-node-meta">Idea • Central hub</div>
-                            </div>
-                            
-                            <div class="sim-node coral" style="top: 80px; left: 420px;">
-                                <div class="sim-node-title">👤 Subject Profile</div>
-                                <div class="sim-node-meta">Note • 8 connections</div>
-                            </div>
-                            
-                            <div class="sim-node green" style="top: 260px; left: 60px;">
-                                <div class="sim-node-title">📎 Evidence A</div>
-                                <div class="sim-node-meta">File • Supporting</div>
-                            </div>
-                            
-                            <div class="sim-node amber" style="top: 290px; left: 230px;">
-                                <div class="sim-node-title">🔗 Connection Found</div>
-                                <div class="sim-node-meta">Insight • Key finding</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Chat panel -->
-                        <div class="solution-app-chat">
-                            <div class="solution-app-chat-header">
-                                <span>🤖</span> AI Assistant
-                            </div>
-                            <div class="solution-app-chat-messages">
-                                <div class="sim-message user">
-                                    <div class="sim-message-bubble">
-                                        What connects the key source to the subject?
-                                    </div>
-                                </div>
-                                <div class="sim-message assistant">
-                                    <div class="sim-message-bubble">
-                                        Based on the linked nodes, there are 3 direct connections: the timeline overlap, the financial records, and the witness statement from Node #7.
-                                    </div>
-                                </div>
-                                <div class="sim-message user">
-                                    <div class="sim-message-bubble">
-                                        Create a summary of this thread
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="solution-app-chat-input">
-                                <input type="text" placeholder="Ask about your research..." disabled>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Feature highlights -->
-            <div class="solution-features">
-                <div class="solution-feature" data-animate>
-                    <div class="solution-feature-icon">🔗</div>
-                    <h3>Visual Connections</h3>
-                    <p>Drag, connect, and arrange your ideas spatially. See relationships at a glance.</p>
-                </div>
-                
-                <div class="solution-feature" data-animate>
-                    <div class="solution-feature-icon">🤖</div>
-                    <h3>AI That Understands Context</h3>
-                    <p>Chat with AI that knows your research. @mention specific nodes for precision.</p>
-                </div>
-                
-                <div class="solution-feature" data-animate>
-                    <div class="solution-feature-icon">🔒</div>
-                    <h3>100% Private</h3>
-                    <p>Everything stays on your machine. No cloud. No sync. No data collection.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- ==========================================
          FEATURES SECTION
@@ -3952,110 +4326,84 @@
                 <p>Everything you need to connect ideas and discover insights.</p>
             </div>
             
-            <!-- Features grid -->
+            <!-- Features grid — 4 pillars -->
             <div class="features-grid">
-                <!-- Visual Graph -->
+                <!-- PILLAR 1: Visual Canvas -->
                 <div class="feature-card" data-animate>
                     <div class="feature-card-icon amber">🔗</div>
-                    <h3>Visual Knowledge Graph</h3>
-                    <p>Drag, drop, and connect. Arrange ideas spatially like a digital whiteboard that never runs out of space. Zoom in on details or out for the big picture.</p>
+                    <h3>Visual Knowledge Canvas</h3>
+                    <p>Drag in anything — PDFs, images, audio, video, code, spreadsheets, entire folders. Arrange them spatially. Draw connections. Group by theme. Collapse long threads. Zoom from overview to detail.</p>
                     <div class="feature-card-tags">
-                        <span class="feature-tag">Drag & Drop</span>
                         <span class="feature-tag">Infinite Canvas</span>
-                        <span class="feature-tag">Zoom</span>
+                        <span class="feature-tag">10+ Node Types</span>
+                        <span class="feature-tag">Groups & Threads</span>
                     </div>
                 </div>
                 
-                <!-- Multiple Node Types -->
-                <div class="feature-card" data-animate>
-                    <div class="feature-card-icon teal">📦</div>
-                    <h3>Rich Node Types</h3>
-                    <p>Not just text. Import PDFs, images, audio, video. Create chat threads, reference nodes, update trackers. Each node type built for purpose.</p>
-                    <div class="feature-card-tags">
-                        <span class="feature-tag">PDF</span>
-                        <span class="feature-tag">Images</span>
-                        <span class="feature-tag">Audio</span>
-                        <span class="feature-tag">Video</span>
-                    </div>
-                </div>
-                
-                <!-- AI Conversations -->
+                <!-- PILLAR 2: Precision AI -->
                 <div class="feature-card" data-animate>
                     <div class="feature-card-icon coral">🤖</div>
-                    <h3>AI Conversations</h3>
-                    <p>Chat with Claude AI that understands your research context. Ask questions, generate summaries, explore connections — all within your graph.</p>
+                    <h3>AI That Sees What You Choose</h3>
+                    <p>Type <strong>@</strong> to pull specific nodes into any AI conversation. AI reads only what you mention — not your entire project. This saves 70-90% on tokens and gives dramatically better answers.</p>
                     <div class="feature-card-tags">
+                        <span class="feature-tag">@Mentions</span>
                         <span class="feature-tag">Claude AI</span>
-                        <span class="feature-tag">Context-Aware</span>
-                        <span class="feature-tag">Threads</span>
+                        <span class="feature-tag">70-90% Token Savings</span>
                     </div>
                 </div>
                 
-                <!-- @Mention System - HIGHLIGHT CARD -->
+                <!-- PILLAR 3: AI Redaction -->
+                <div class="feature-card" data-animate id="redaction">
+                    <div class="feature-card-icon green">🛡️</div>
+                    <h3>AI Redaction — Your Words, Protected</h3>
+                    <p>Automatically replace real names, locations, case numbers, and sensitive terms with placeholders <strong>before AI ever sees them</strong>. AI responds using the placeholders — then Branch Bot swaps the real words back in for you. The AI never knows the originals.</p>
+                    <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 20px; font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.8;">
+                        <span style="color: var(--text-dim);">What you type:</span><br>
+                        <span>Summarize evidence linking <span style="background: rgba(199,93,93,0.2); color: var(--accent-coral); padding: 2px 6px; border-radius: 4px; text-decoration: line-through;">John Smith</span> to <span style="background: rgba(199,93,93,0.2); color: var(--accent-coral); padding: 2px 6px; border-radius: 4px; text-decoration: line-through;">Apex Corp</span></span><br><br>
+                        <span style="color: var(--text-dim);">What AI sees:</span><br>
+                        <span>Summarize evidence linking <span style="background: rgba(61,122,90,0.2); color: var(--accent-green); padding: 2px 6px; border-radius: 4px;">[PERSON-1]</span> to <span style="background: rgba(61,122,90,0.2); color: var(--accent-green); padding: 2px 6px; border-radius: 4px;">[ORG-1]</span></span>
+                    </div>
+                    <div class="feature-card-tags">
+                        <span class="feature-tag">👤 People</span>
+                        <span class="feature-tag">🏢 Organizations</span>
+                        <span class="feature-tag">📍 Locations</span>
+                        <span class="feature-tag">📋 Case Numbers</span>
+                        <span class="feature-tag">🔒 Custom Rules</span>
+                    </div>
+                </div>
+                
+                <!-- PILLAR 4: Capture → Create Pipeline -->
+                <div class="feature-card" data-animate>
+                    <div class="feature-card-icon teal">⚡</div>
+                    <h3>Capture → Organize → Create</h3>
+                    <p><strong>Quick Capture</strong> (Ctrl+Shift+B) grabs text, URLs, or screenshots from any app without leaving it. Checklists track tasks with due dates. Presentations export as standalone HTML. Graph Insights visualize your structure.</p>
+                    <div class="feature-card-tags">
+                        <span class="feature-tag">Quick Capture</span>
+                        <span class="feature-tag">Checklists</span>
+                        <span class="feature-tag">Presentations</span>
+                        <span class="feature-tag">Graph Insights</span>
+                    </div>
+                </div>
+                
+                <!-- HIGHLIGHT: @mention demo (full width) -->
                 <div class="feature-card highlight" data-animate>
                     <div class="feature-card-content">
                         <div class="feature-card-icon amber">@</div>
-                        <h3>Precision @Mentions</h3>
-                        <p>The killer feature. @mention specific nodes to pull exact context into any AI conversation. No more copying and pasting. No wasted tokens. Surgical precision.</p>
+                        <h3>The @Mention Difference</h3>
+                        <p>Other AI tools send your <em>entire</em> conversation every time — burning tokens on irrelevant context. Branch Bot lets you surgically select exactly which nodes to include. This is why users save 70-90% compared to ChatGPT and Claude web.</p>
                         <div class="feature-card-tags">
                             <span class="feature-tag">Cost Control</span>
+                            <span class="feature-tag">Better Answers</span>
                             <span class="feature-tag">Exact Context</span>
-                            <span class="feature-tag">Power User</span>
                         </div>
                     </div>
                     <div class="feature-card-visual">
                         <div class="mention-demo">
                             <span style="color: var(--text-dim);">You:</span><br>
-                            Summarize the connection between <span class="mention">@Node #12</span> and <span class="mention">@Node #47</span> focusing on the timeline discrepancy.<span class="cursor"></span>
+                            Compare the findings in <span class="mention">@Node #12 "Lab Results"</span> with <span class="mention">@Node #47 "Field Report"</span> — focus on the timeline discrepancy.<span class="cursor"></span>
+                            <br><br>
+                            <span style="color: var(--text-dim); font-size: 0.75rem;">💡 AI sees only those 2 nodes — not your 200-node project</span>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- File Sync -->
-                <div class="feature-card" data-animate>
-                    <div class="feature-card-icon green">📂</div>
-                    <h3>Smart File Sync</h3>
-                    <p>Link external files and folders. Branch Bot watches for changes and creates proposal nodes when files update. Your research stays current.</p>
-                    <div class="feature-card-tags">
-                        <span class="feature-tag">Auto-Watch</span>
-                        <span class="feature-tag">Proposals</span>
-                        <span class="feature-tag">Diff View</span>
-                    </div>
-                </div>
-                
-                <!-- Privacy -->
-                <div class="feature-card" data-animate>
-                    <div class="feature-card-icon teal">🔒</div>
-                    <h3>Uncompromising Privacy</h3>
-                    <p>Your data never leaves your computer. No cloud sync. No accounts required. No data collection. SQLite databases you own completely.</p>
-                    <div class="feature-card-tags">
-                        <span class="feature-tag">100% Local</span>
-                        <span class="feature-tag">No Cloud</span>
-                        <span class="feature-tag">You Own It</span>
-                    </div>
-                </div>
-                
-                <!-- Export & Presentations -->
-                <div class="feature-card" data-animate>
-                    <div class="feature-card-icon coral">📤</div>
-                    <h3>Export & Present</h3>
-                    <p>Export threads as documents. Create interactive HTML presentations. Share your findings without sharing your whole brain.</p>
-                    <div class="feature-card-tags">
-                        <span class="feature-tag">HTML Export</span>
-                        <span class="feature-tag">Presentations</span>
-                        <span class="feature-tag">JSON</span>
-                    </div>
-                </div>
-                
-                <!-- Templates -->
-                <div class="feature-card" data-animate>
-                    <div class="feature-card-icon green">📋</div>
-                    <h3>Ready-Made Templates</h3>
-                    <p>Start fast with templates for investigations, research projects, writing, and more. Or create your own and reuse across projects.</p>
-                    <div class="feature-card-tags">
-                        <span class="feature-tag">Quick Start</span>
-                        <span class="feature-tag">Investigation</span>
-                        <span class="feature-tag">Research</span>
                     </div>
                 </div>
             </div>
@@ -4540,6 +4888,7 @@
                         <li><span>✓</span> 2,500 nodes per project</li>
                         <li class="highlight"><span>✓</span> 400 AI calls/month</li>
                         <li><span>✓</span> 200MB file uploads</li>
+                        <li class="highlight"><a href="#redaction" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 12px;"><span>🛡️</span> AI Privacy / Redaction ↗</a></li>
                         <li><span>✓</span> Priority support</li>
                     </ul>
                     
@@ -4575,6 +4924,7 @@
                         <li><span>✓</span> Unlimited nodes</li>
                         <li class="highlight"><span>✓</span> 1,000 AI calls/month</li>
                         <li><span>✓</span> 1GB file uploads</li>
+                        <li class="highlight"><a href="#redaction" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 12px;"><span>🛡️</span> AI Privacy / Redaction ↗</a></li>
                         <li><span>✓</span> Priority support</li>
                     </ul>
                     
@@ -5299,6 +5649,82 @@
                     item.classList.toggle('open');
                 });
             });
+        })();
+        // ==========================================
+        // SHOWCASE MEDIA AUTO-SWITCH
+        // ==========================================
+        // 🎬 CONFIGURE YOUR MEDIA HERE
+        // When you have real media, just fill in these URLs and
+        // the page automatically hides the placeholder and shows real content.
+        (function() {
+            const MEDIA_CONFIG = {
+                // Option A: Video (takes priority if set)
+                videoUrl: '',        // e.g. 'https://yoursite.com/demo.mp4'
+                videoPoster: '',     // e.g. 'https://yoursite.com/poster.jpg'
+                
+                // Option B: Screenshot carousel (used if no video)
+                screenshots: [
+                    // e.g. 'https://yoursite.com/screenshot1.png',
+                    // 'https://yoursite.com/screenshot2.png',
+                ],
+            };
+            
+            const placeholder = document.getElementById('showcase-placeholder');
+            const videoContainer = document.getElementById('showcase-video');
+            const videoEl = document.getElementById('showcase-video-el');
+            const screenshotsContainer = document.getElementById('showcase-screenshots');
+            const track = document.getElementById('showcase-screenshots-track');
+            const dots = document.getElementById('showcase-dots');
+            
+            // Option A: Video
+            if (MEDIA_CONFIG.videoUrl) {
+                placeholder.classList.add('hidden');
+                videoContainer.classList.remove('hidden');
+                videoEl.querySelector('source').src = MEDIA_CONFIG.videoUrl;
+                if (MEDIA_CONFIG.videoPoster) videoEl.poster = MEDIA_CONFIG.videoPoster;
+                videoEl.load();
+                return;
+            }
+            
+            // Option B: Screenshots
+            if (MEDIA_CONFIG.screenshots.length > 0) {
+                placeholder.classList.add('hidden');
+                screenshotsContainer.classList.remove('hidden');
+                
+                MEDIA_CONFIG.screenshots.forEach((src, i) => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = `Branch Bot screenshot ${i + 1}`;
+                    img.loading = 'lazy';
+                    track.appendChild(img);
+                    
+                    const dot = document.createElement('span');
+                    dot.className = 'showcase-nav-dot' + (i === 0 ? ' active' : '');
+                    dot.dataset.index = i;
+                    dots.appendChild(dot);
+                });
+                
+                // Nav buttons
+                let currentSlide = 0;
+                const total = MEDIA_CONFIG.screenshots.length;
+                
+                function goTo(idx) {
+                    currentSlide = Math.max(0, Math.min(idx, total - 1));
+                    track.scrollTo({ left: track.offsetWidth * currentSlide, behavior: 'smooth' });
+                    dots.querySelectorAll('.showcase-nav-dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === currentSlide);
+                    });
+                }
+                
+                document.getElementById('showcase-prev')?.addEventListener('click', () => goTo(currentSlide - 1));
+                document.getElementById('showcase-next')?.addEventListener('click', () => goTo(currentSlide + 1));
+                dots.addEventListener('click', (e) => {
+                    if (e.target.dataset.index !== undefined) goTo(parseInt(e.target.dataset.index));
+                });
+                return;
+            }
+            
+            // Default: show placeholder (already visible)
         })();
     </script>
 </body>
