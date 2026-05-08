@@ -520,241 +520,160 @@
                 display: none;
             }
         }
-        
         /* ========================================
-           PROBLEM SECTION
+           BUILT FOR SECTION
            ======================================== */
-        .problem {
+        .built-for {
             position: relative;
-            padding: 140px 0;
+            padding: 100px 0;
             overflow: hidden;
         }
         
-        .problem-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(199, 93, 93, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(61, 139, 139, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        .problem-header {
-            text-align: center;
-            margin-bottom: 80px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .problem-header h2 {
-            margin-bottom: 16px;
-        }
-        
-        .problem-header h2 span {
-            color: var(--accent-coral);
-        }
-        
-        /* Floating quotes grid */
-        .problem-quotes {
+        .built-for-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
             max-width: 1000px;
-            margin: 0 auto 80px;
-            position: relative;
-            z-index: 2;
+            margin: 0 auto;
         }
         
-        .problem-quote {
+        .built-for-card {
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 32px;
-            position: relative;
-            transition: all var(--transition-medium);
+            padding: 28px 24px;
+            text-align: center;
+            transition: all 0.3s ease;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
         }
         
-        .problem-quote.visible {
+        .built-for-card.visible {
             opacity: 1;
             transform: translateY(0);
         }
         
-        .problem-quote:hover {
-            border-color: var(--border-light);
+        .built-for-card:nth-child(1) { transition-delay: 0.1s; }
+        .built-for-card:nth-child(2) { transition-delay: 0.15s; }
+        .built-for-card:nth-child(3) { transition-delay: 0.2s; }
+        .built-for-card:nth-child(4) { transition-delay: 0.25s; }
+        
+        .built-for-card:hover {
+            border-color: var(--accent-amber);
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
         }
         
-        /* Stagger the animations */
-        .problem-quote:nth-child(1) { transition-delay: 0.1s; }
-        .problem-quote:nth-child(2) { transition-delay: 0.2s; }
-        .problem-quote:nth-child(3) { transition-delay: 0.3s; }
-        .problem-quote:nth-child(4) { transition-delay: 0.4s; }
-        
-        /* Quote icon */
-        .problem-quote::before {
-            content: '"';
-            position: absolute;
-            top: 20px;
-            left: 24px;
-            font-family: var(--font-headline);
-            font-size: 4rem;
-            line-height: 1;
-            color: var(--accent-amber);
-            opacity: 0.2;
+        .built-for-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
         }
         
-        .problem-quote-text {
-            font-family: var(--font-headline);
-            font-size: 1.25rem;
-            font-weight: 500;
-            line-height: 1.5;
+        .built-for-card h3 {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 8px;
         }
         
-        .problem-quote-author {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .problem-quote-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        
-        .problem-quote-icon.researcher {
-            background: rgba(61, 139, 139, 0.2);
-        }
-        
-        .problem-quote-icon.journalist {
-            background: rgba(232, 168, 73, 0.2);
-        }
-        
-        .problem-quote-icon.writer {
-            background: rgba(199, 93, 93, 0.2);
-        }
-        
-        .problem-quote-icon.investigator {
-            background: rgba(61, 122, 90, 0.2);
-        }
-        
-        .problem-quote-role {
-            font-size: 0.875rem;
+        .built-for-card p {
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            line-height: 1.5;
         }
         
-        /* The big pain statement */
-        .problem-statement {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto;
+        .built-for-why {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: var(--accent-amber);
+            font-family: var(--font-mono);
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .built-for-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .built-for-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ========================================
+           COMPETITOR COMPARISON GRID
+           ======================================== */
+        .competitor-grid {
+            display: grid;
+            grid-template-columns: 200px repeat(4, 1fr);
+            gap: 0;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 60px;
             position: relative;
             z-index: 2;
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s ease;
+            transition: all 0.6s ease 0.2s;
         }
         
-        .problem-statement.visible {
+        .competitor-grid.visible {
             opacity: 1;
             transform: translateY(0);
         }
         
-        .problem-statement p {
-            font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-            line-height: 1.7;
-            color: var(--text-secondary);
-        }
-        
-        .problem-statement strong {
-            color: var(--text-primary);
-        }
-        
-        .problem-statement .highlight {
-            color: var(--accent-amber);
+        .competitor-header {
+            padding: 16px 20px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            text-align: center;
         }
         
-        /* Decorative connection lines */
-        .problem-lines {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.5;
+        .competitor-header.bb {
+            color: var(--accent-amber);
+            background: rgba(232, 168, 73, 0.08);
         }
         
-        .problem-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, var(--accent-coral), transparent);
-            height: 1px;
-            opacity: 0;
-            transition: opacity 1s ease;
+        .competitor-header.feature-col {
+            text-align: left;
         }
         
-        .problem-line.visible {
-            opacity: 0.3;
+        .competitor-cell {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .problem-line:nth-child(1) {
-            top: 30%;
-            left: 10%;
-            width: 30%;
-            transform: rotate(15deg);
+        .competitor-cell.feature-name {
+            justify-content: flex-start;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.85rem;
         }
         
-        .problem-line:nth-child(2) {
-            top: 50%;
-            right: 10%;
-            width: 25%;
-            transform: rotate(-10deg);
-        }
+        .competitor-cell .yes { color: #22c55e; font-weight: 700; font-size: 1.1rem; }
+        .competitor-cell .no { color: var(--text-dim); font-size: 1.1rem; }
+        .competitor-cell .partial { color: #f59e0b; font-size: 0.8rem; }
+        .competitor-cell .unique { color: var(--accent-amber); font-weight: 600; font-size: 0.8rem; }
+        .competitor-cell.bb-col { background: rgba(232, 168, 73, 0.04); }
         
-        .problem-line:nth-child(3) {
-            bottom: 35%;
-            left: 20%;
-            width: 20%;
-            transform: rotate(5deg);
-        }
-        
-        /* Responsive */
         @media (max-width: 768px) {
-            .problem {
-                padding: 100px 0;
-            }
-            
-            .problem-quotes {
-                grid-template-columns: 1fr;
-                padding: 0 16px;
-            }
-            
-            .problem-quote {
-                padding: 24px;
-            }
-            
-            .problem-quote-text {
-                font-size: 1.125rem;
-            }
+            .competitor-grid { display: none; }
         }
-        
         /* ========================================
            WHY BRANCH BOT SECTION
            ======================================== */
@@ -879,92 +798,6 @@
             color: var(--accent-amber);
         }
         
-        /* Comparison table */
-        .why-bb-compare {
-            background: var(--bg-deep);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 60px;
-            position: relative;
-            z-index: 2;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease 0.2s;
-        }
-        
-        .why-bb-compare.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .why-bb-compare-header {
-            display: grid;
-            grid-template-columns: 200px 1fr 1fr;
-            gap: 0;
-            padding: 18px 28px;
-            background: var(--bg-elevated);
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .why-bb-compare-label {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--text-dim);
-        }
-        
-        .why-bb-compare-label.why-bb-compare-bb {
-            color: var(--accent-amber);
-        }
-        
-        .why-bb-compare-row {
-            display: grid;
-            grid-template-columns: 200px 1fr 1fr;
-            gap: 0;
-            padding: 16px 28px;
-            border-bottom: 1px solid var(--border);
-            transition: background var(--transition-fast);
-        }
-        
-        .why-bb-compare-row:last-child {
-            border-bottom: none;
-        }
-        
-        .why-bb-compare-row:hover {
-            background: var(--bg-surface);
-        }
-        
-        .why-bb-compare-tool {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .why-bb-compare-tool span {
-            font-size: 1.125rem;
-        }
-        
-        .why-bb-compare-them {
-            font-size: 0.9375rem;
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-        }
-        
-        .why-bb-compare-us {
-            font-size: 0.9375rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            padding-left: 16px;
-            border-left: 2px solid rgba(232, 168, 73, 0.3);
-        }
         
         /* Stats row */
         .why-bb-stats {
@@ -1014,11 +847,7 @@
         
         /* Responsive */
         @media (max-width: 1024px) {
-            .why-bb-compare-header,
-            .why-bb-compare-row {
-                grid-template-columns: 160px 1fr 1fr;
-                padding: 14px 20px;
-            }
+            
         }
         
         @media (max-width: 768px) {
@@ -1035,30 +864,7 @@
                 padding: 28px 24px;
             }
             
-            .why-bb-compare-header {
-                display: none;
-            }
             
-            .why-bb-compare-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 20px 24px;
-            }
-            
-            .why-bb-compare-us {
-                border-left: 2px solid var(--accent-amber);
-                padding-left: 12px;
-                font-weight: 500;
-            }
-            
-            .why-bb-compare-them::before {
-                content: '❌ ';
-            }
-            
-            .why-bb-compare-us::before {
-                content: '✓ ';
-                color: var(--accent-amber);
-            }
             
             .why-bb-stats {
                 flex-direction: column;
@@ -2828,6 +2634,52 @@
             }
         }
         /* ========================================
+           BYOK EXPLAINER
+           ======================================== */
+        .byok-explainer {
+            max-width: 800px;
+            margin: 48px auto 0;
+            background: linear-gradient(135deg, rgba(61, 139, 139, 0.08) 0%, rgba(232, 168, 73, 0.08) 100%);
+            border: 1px solid rgba(61, 139, 139, 0.2);
+            border-radius: 16px;
+            padding: 32px 36px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 24px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .byok-explainer.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .byok-explainer-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: rgba(61, 139, 139, 0.15);
+            border-radius: 16px;
+        }
+        
+        .byok-explainer h3 { font-size: 1.125rem; margin-bottom: 8px; color: var(--text-primary); }
+        .byok-explainer p { font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0; }
+        .byok-savings { display: inline-block; margin-top: 8px; font-family: var(--font-mono); font-size: 0.8125rem; color: var(--accent-amber); font-weight: 600; }
+        
+        @media (max-width: 768px) {
+            .byok-explainer { grid-template-columns: 1fr; text-align: center; padding: 24px; }
+            .byok-explainer-icon { margin: 0 auto; }
+        }
+        
+        /* ========================================
            DOWNLOAD / CTA SECTION
            ======================================== */
         .download {
@@ -3979,36 +3831,38 @@
         <div class="hero-content">
             <div class="hero-label">
                 <span class="hero-label-dot"></span>
-                <span>Desktop App — Windows (Mac & Linux coming soon)</span>
+                <span>Desktop App — 100% Offline · Zero Cloud</span>
             </div>
             
-            <h1>Your Research.<br><span>Connected.</span> Private. AI-Powered.</h1>
+            <h1>AI Research That <span>Never Leaves</span> Your Laptop</h1>
             
             <p class="hero-subtitle">
-                A desktop app that puts everything on a visual canvas — PDFs, notes, images, files — then lets you connect ideas and chat with AI about exactly what you choose. 100% local. Your data never leaves your machine.
+                The only knowledge tool where AI sees exactly what you choose, 
+                your data never touches a server, and every connection is visible. 
+                Built for investigators, attorneys, researchers and knowledge workers require privacy.
             </p>
             
             <div class="hero-cta">
                 <a href="#download" class="btn btn-primary">
-                    <span>⬇</span> Download Free
+                    <span>⬇</span> Download Free — No Account Needed
                 </a>
-                <a href="#features" class="btn btn-secondary">
-                    <span>→</span> See How It Works
+                <a href="#showcase" class="btn btn-secondary">
+                    <span>▶</span> See It In Action
                 </a>
             </div>
             
             <div class="hero-trust">
                 <div class="hero-trust-item">
                     <span class="hero-trust-icon">✓</span>
-                    <span>100% Local</span>
+                    <span>No cloud. No account. No tracking.</span>
                 </div>
                 <div class="hero-trust-item">
                     <span class="hero-trust-icon">✓</span>
-                    <span>No Cloud Required</span>
+                    <span>Your API key → Anthropic directly</span>
                 </div>
                 <div class="hero-trust-item">
                     <span class="hero-trust-icon">✓</span>
-                    <span>Your Data Stays Yours</span>
+                    <span>SQLite on your machine — you own it</span>
                 </div>
             </div>
         </div>
@@ -4061,7 +3915,7 @@
                                     <line x1="50" y1="15" x2="78" y2="30" />
                                     <line x1="22" y1="20" x2="35" y2="45" />
                                 </svg>
-                                <div class="sp-badge">🎬 Video coming soon — download to try it yourself</div>
+                                <div class="sp-badge">🎬 Real screenshots coming soon — <a href="#download" style="color: var(--accent-amber); text-decoration: underline;">download to try it yourself</a></div>
                             </div>
                             <div class="showcase-placeholder-chat">
                                 <div class="sp-chat-header">🤖 AI Chat</div>
@@ -4147,86 +4001,46 @@
             </div>
         </div>
     </section>
-
     <!-- ==========================================
-         PROBLEM SECTION
+         WHO IT'S BUILT FOR
          ========================================== -->
-    <section class="problem" id="problem">
-        <!-- Background decoration -->
-        <div class="problem-bg"></div>
-        
-        <!-- Decorative lines -->
-        <div class="problem-lines">
-            <div class="problem-line"></div>
-            <div class="problem-line"></div>
-            <div class="problem-line"></div>
-        </div>
-        
+    <section class="built-for" id="built-for">
         <div class="container">
-            <!-- Header -->
-            <div class="problem-header">
-                <span class="section-label">The Problem</span>
-                <h2>Lost in the <span>Noise</span></h2>
-                <p>Sound familiar?</p>
+            <div class="section-header">
+                <span class="section-label">Who It's For</span>
+                <h2>Built for People Who <span>Can't Risk</span> a Data Leak</h2>
+                <p>If your work involves confidential information, cloud tools aren't an option. Branch Bot is.</p>
             </div>
             
-            <!-- Quote cards -->
-            <div class="problem-quotes">
-                <!-- Researcher -->
-                <div class="problem-quote" data-animate>
-                    <p class="problem-quote-text">
-                        "I have 200 sources but I can't see how they connect. The insight is in there somewhere..."
-                    </p>
-                    <div class="problem-quote-author">
-                        <div class="problem-quote-icon researcher">📚</div>
-                        <span class="problem-quote-role">— Researcher</span>
-                    </div>
+            <div class="built-for-grid">
+                <div class="built-for-card" data-animate>
+                    <div class="built-for-icon">🔍</div>
+                    <h3>Private Investigators</h3>
+                    <p>Case evidence, subject connections, surveillance notes — organized visually, stored locally.</p>
+                    <div class="built-for-why">→ Client confidentiality protected</div>
                 </div>
-                
-                <!-- Journalist -->
-                <div class="problem-quote" data-animate>
-                    <p class="problem-quote-text">
-                        "My story has 47 threads and I keep losing track. Where did that lead go?"
-                    </p>
-                    <div class="problem-quote-author">
-                        <div class="problem-quote-icon journalist">📰</div>
-                        <span class="problem-quote-role">— Journalist</span>
-                    </div>
+                <div class="built-for-card" data-animate>
+                    <div class="built-for-icon">⚖️</div>
+                    <h3>Attorneys</h3>
+                    <p>Case files, depositions, evidence chains — AI analysis without violating privilege.</p>
+                    <div class="built-for-why">→ Attorney-client privilege maintained</div>
                 </div>
-                
-                <!-- Writer -->
-                <div class="problem-quote" data-animate>
-                    <p class="problem-quote-text">
-                        "Character relationships got so complex I need a map. My notes app isn't cutting it."
-                    </p>
-                    <div class="problem-quote-author">
-                        <div class="problem-quote-icon writer">✍️</div>
-                        <span class="problem-quote-role">— Writer</span>
-                    </div>
+                <div class="built-for-card" data-animate>
+                    <div class="built-for-icon">🛡️</div>
+                    <h3>OSINT Researchers</h3>
+                    <p>Entity mapping, source tracking, connection analysis — with redaction before AI sees anything.</p>
+                    <div class="built-for-why">→ Sources and methods protected</div>
                 </div>
-                
-                <!-- Investigator -->
-                <div class="problem-quote" data-animate>
-                    <p class="problem-quote-text">
-                        "Evidence is everywhere. The pattern is nowhere. I need to see the full picture."
-                    </p>
-                    <div class="problem-quote-author">
-                        <div class="problem-quote-icon investigator">🔍</div>
-                        <span class="problem-quote-role">— Investigator</span>
-                    </div>
+                <div class="built-for-card" data-animate>
+                    <div class="built-for-icon">📰</div>
+                    <h3>Journalists</h3>
+                    <p>Source protection, investigation threads, evidence organization — no cloud exposure.</p>
+                    <div class="built-for-why">→ Source identity never exposed</div>
                 </div>
-            </div>
-            
-            <!-- Big statement -->
-            <div class="problem-statement" data-animate>
-                <p>
-                    <strong>Your brain thinks in connections.</strong><br>
-                    Your tools don't.<br><br>
-                    Scattered notes. Endless tabs. That <span class="highlight">crucial connection</span> — buried.
-                </p>
             </div>
         </div>
     </section>
+    
 
     <!-- ==========================================
          WHY BRANCH BOT SECTION
@@ -4261,33 +4075,72 @@
             </div>
             
             <!-- Comparison table -->
-            <div class="why-bb-compare" data-animate>
-                <div class="why-bb-compare-header">
-                    <div class="why-bb-compare-label">If You Use</div>
-                    <div class="why-bb-compare-label">What You're Missing</div>
-                    <div class="why-bb-compare-label why-bb-compare-bb">What You Get With Branch Bot</div>
-                </div>
+            <div class="competitor-grid" data-animate>
+                <div class="competitor-header feature-col">Feature</div>
+                <div class="competitor-header bb">🌳 Branch Bot</div>
+                <div class="competitor-header">Heptabase</div>
+                <div class="competitor-header">Obsidian</div>
+                <div class="competitor-header">Second Brain</div>
                 
-               <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>📝</span> Notion / Obsidian</div>
-                    <div class="why-bb-compare-them">No visual connections, no AI analysis</div>
-                    <div class="why-bb-compare-us">Visual canvas + AI that reads your sources on command</div>
-                </div>
-                <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>🤖</span> ChatGPT / Claude Web</div>
-                    <div class="why-bb-compare-them">Forgets everything, sends entire context every time</div>
-                    <div class="why-bb-compare-us">@mention any node — AI sees exactly what you choose, always</div>
-                </div>
-                <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>🎨</span> Miro / FigJam</div>
-                    <div class="why-bb-compare-them">Visual whiteboard but zero AI intelligence</div>
-                    <div class="why-bb-compare-us">Spatial thinking + AI analysis + file handling in one tool</div>
-                </div>
-                <div class="why-bb-compare-row">
-                    <div class="why-bb-compare-tool"><span>☁️</span> Google Drive / OneDrive</div>
-                    <div class="why-bb-compare-them">Your confidential files on someone else's servers</div>
-                    <div class="why-bb-compare-us">100% local — your data never leaves your machine</div>
-                </div>
+                <div class="competitor-cell feature-name">Data never leaves device</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">No account required</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">Built-in AI chat</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="partial">Plugin</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                
+                <div class="competitor-cell feature-name">@mention surgical context</div>
+                <div class="competitor-cell bb-col"><span class="unique">Only us</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">BYOK — use your own key</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="partial">Plugin</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">AI redaction / privacy</div>
+                <div class="competitor-cell bb-col"><span class="unique">Only us</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">Visual canvas + graph</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="partial">Plugin</span></div>
+                <div class="competitor-cell"><span class="partial">Basic</span></div>
+                
+                <div class="competitor-cell feature-name">Standalone presentation export</div>
+                <div class="competitor-cell bb-col"><span class="unique">Only us</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">Token cost transparency</div>
+                <div class="competitor-cell bb-col"><span class="unique">Only us</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
+                
+                <div class="competitor-cell feature-name">Free tier</div>
+                <div class="competitor-cell bb-col"><span class="yes">✓ Forever</span></div>
+                <div class="competitor-cell"><span class="partial">7-day trial</span></div>
+                <div class="competitor-cell"><span class="yes">✓</span></div>
+                <div class="competitor-cell"><span class="no">✗</span></div>
             </div>
            
             <!-- Bottom stat callouts -->
@@ -4303,8 +4156,8 @@
                 </div>
                 <div class="why-bb-stat-divider"></div>
                 <div class="why-bb-stat">
-                    <div class="why-bb-stat-value">5→1</div>
-                    <div class="why-bb-stat-label">Tools Replaced</div>
+                    <div class="why-bb-stat-value">10+</div>
+                    <div class="why-bb-stat-label">Node Types</div>
                 </div>
             </div>
         </div>
@@ -4384,7 +4237,17 @@
                         <span class="feature-tag">Graph Insights</span>
                     </div>
                 </div>
-                
+                <!-- Project Summary -->
+                <div class="feature-card" data-animate>
+                    <div class="feature-card-icon teal">📋</div>
+                    <h3>Project Summary — One Click Overview</h3>
+                    <p>Instantly analyze your entire project: every file, conversation, connection, and pattern — extracted structurally, no AI needed. Optionally add AI synthesis for deeper insights. A living document that evolves with your work.</p>
+                    <div class="feature-card-tags">
+                        <span class="feature-tag">Auto-extraction</span>
+                        <span class="feature-tag">AI Optional</span>
+                        <span class="feature-tag">Clickable References</span>
+                    </div>
+                </div>
                 <!-- HIGHLIGHT: @mention demo (full width) -->
                 <div class="feature-card highlight" data-animate>
                     <div class="feature-card-content">
@@ -4490,7 +4353,7 @@
                     </div>
                     
                     <div class="use-case-visual researcher">
-                        <div class="use-case-story-label">Success Story</div>
+                        <div class="use-case-story-label">Example Workflow</div>
                         <div class="use-case-story-title">"I mapped 3 years of literature in one weekend"</div>
                         <div class="use-case-story-text">
                             A PhD student used Branch Bot to visualize 200+ academic papers for her dissertation. By mapping the connections between sources, she discovered a gap in the literature that became her core argument.
@@ -4547,7 +4410,7 @@
                     </div>
                     
                     <div class="use-case-visual journalist">
-                        <div class="use-case-story-label">Success Story</div>
+                        <div class="use-case-story-label">Example Workflow</div>
                         <div class="use-case-story-title">"The pattern was there all along"</div>
                         <div class="use-case-story-text">
                             A journalist investigating local government mapped 3 years of city council votes, campaign donations, and business permits. The visual graph revealed a voting pattern that became the centerpiece of her exposé.
@@ -4604,7 +4467,7 @@
                     </div>
                     
                     <div class="use-case-visual writer">
-                        <div class="use-case-story-label">Success Story</div>
+                        <div class="use-case-story-label">Example Workflow</div>
                         <div class="use-case-story-title">"47 characters and zero plot holes"</div>
                         <div class="use-case-story-text">
                             A fantasy author mapped her entire trilogy — 47 characters, 12 locations, and a branching timeline. Using the @mention feature, she asked AI to verify continuity across all three books before publication.
@@ -4661,7 +4524,7 @@
                     </div>
                     
                     <div class="use-case-visual investigator">
-                        <div class="use-case-story-label">Success Story</div>
+                        <div class="use-case-story-label">Example Workflow</div>
                         <div class="use-case-story-title">"The connection that cracked the case"</div>
                         <div class="use-case-story-text">
                             A private investigator working an insurance fraud case imported 6 months of social media, financial records, and witness statements. The visual graph revealed a connection between two "strangers" that proved collusion.
@@ -4938,14 +4801,22 @@
                     </div>
                 </div>
             </div>
-            
+            <!-- BYOK Explainer -->
+            <div class="byok-explainer" data-animate>
+                <div class="byok-explainer-icon">🔑</div>
+                <div>
+                    <h3>What is BYOK? (Bring Your Own Key)</h3>
+                    <p>Use your own Anthropic API key. Pay them directly at wholesale rates — no markup from us. Your queries go straight to Claude. We never see them, store them, or charge extra for them.</p>
+                    <span class="byok-savings">💡 Power users save 40-60% compared to hosted plans</span>
+                </div>
+            </div>
             <!-- Bottom note -->
             <div class="pricing-note">
                 <p>All plans include automatic updates. Questions? <a href="mailto:branchbotconnect@gmail.com">Contact us</a></p>
             </div>
         </div>
     </section>
-
+    
     <!-- ==========================================
          DOWNLOAD / CTA SECTION
          ========================================== -->
@@ -5050,18 +4921,7 @@
             
             <!-- FAQ grid -->
             <div class="faq-grid">
-                <!-- Q1 -->
-                <div class="faq-item" data-animate>
-                    <button class="faq-question">
-                        <span>Does Branch Bot work offline?</span>
-                        <span class="faq-question-icon">+</span>
-                    </button>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Yes! Branch Bot runs 100% locally on your computer. All your notes, connections, and files work without internet. The only feature that requires internet is AI chat (which calls the Claude API). Everything else works completely offline.
-                        </div>
-                    </div>
-                </div>
+                
                 
                 <!-- Q2 -->
                 <div class="faq-item" data-animate>
@@ -5102,18 +4962,7 @@
                     </div>
                 </div>
                 
-                <!-- Q5 -->
-                <div class="faq-item" data-animate>
-                    <button class="faq-question">
-                        <span>What file types can I import?</span>
-                        <span class="faq-question-icon">+</span>
-                    </button>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Branch Bot supports PDFs, images (PNG, JPG, GIF), audio files, video files, and text documents. You can drag and drop files directly onto the canvas, and they become nodes you can connect and reference in AI conversations.
-                        </div>
-                    </div>
-                </div>
+               
                 
                 <!-- Q6 -->
                 <div class="faq-item" data-animate>
@@ -5127,7 +4976,41 @@
                         </div>
                     </div>
                 </div>
+                <div class="faq-item" data-animate>
+                    <button class="faq-question">
+                        <span>How is Branch Bot different from Obsidian?</span>
+                        <span class="faq-question-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Obsidian is a fantastic text editor with a graph view, but it has no built-in AI, no visual canvas for spatial organization, no presentation export, and no redaction tools. Branch Bot is a visual-first tool where AI conversation and the canvas are the same experience — not bolted on through plugins.
+                        </div>
+                    </div>
+                </div>
                 
+                <div class="faq-item" data-animate>
+                    <button class="faq-question">
+                        <span>Why not just use Heptabase?</span>
+                        <span class="faq-question-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Heptabase syncs your data through AWS cloud servers and requires an account. If you handle confidential information — legal cases, investigations, sensitive research — that cloud dependency is a dealbreaker. Branch Bot is 100% local with no cloud sync, no account, and AI redaction tools that replace sensitive terms before AI ever sees them.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-animate>
+                    <button class="faq-question">
+                        <span>What does "@mention" mean and why does it save money?</span>
+                        <span class="faq-question-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            In most AI tools, your entire conversation history is sent every time — even irrelevant parts. In Branch Bot, you type @ and select exactly which nodes the AI should read. A 200-node project where you @mention 2 documents means AI processes those 2 — not all 200. Users typically save 70-90% on AI costs.
+                        </div>
+                    </div>
+                </div>
                 <!-- Q7 -->
                 <div class="faq-item" data-animate>
                     <button class="faq-question">
@@ -5261,6 +5144,14 @@
         (function() {
             const canvas = document.getElementById('hero-canvas');
             if (!canvas) return;
+            
+            // Skip Three.js on mobile for performance
+            const isMobile = window.innerWidth < 768 || 
+                             /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (isMobile) {
+                canvas.style.display = 'none';
+                return;
+            }
             
             // Scene setup
             const scene = new THREE.Scene();
